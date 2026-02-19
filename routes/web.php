@@ -3,6 +3,9 @@
 use App\Http\Controllers\AksesUserController;
 use App\Http\Controllers\CreateUserController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MasterKategoriController;
+use App\Http\Controllers\MasterKompetensiController;
+use App\Http\Controllers\MasterKompetensiPelatihanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SSOLoginController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +33,30 @@ Route::prefix('user-management')->group(function () {
     Route::post('/permissions/update', [AksesUserController::class, 'updatePermission'])->name('user-management.permission.update');
     Route::post('/status-update', [AksesUserController::class, 'updateStatus'])->name('user-management.status.update');
 });
+Route::get('/ajax-users', [AksesUserController::class, 'ajaxUsers'])->name('user-management.listuser');
+Route::resource('kategori', MasterKategoriController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kategori.index']);
+Route::get('/kategori-data', [MasterKategoriController::class, 'data'])->name('kategori.data');
+Route::resource('kompetensi', MasterKompetensiController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi.index']);
+Route::get('/kompetensi-data', [MasterKompetensiController::class, 'data'])->name('kompetensi.data');
+Route::resource('kompetensi_pelatihan', MasterKompetensiPelatihanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi_pelatihan.index']);
+Route::get('/kompetensi_pelatihan-data', [MasterKompetensiPelatihanController::class, 'data'])->name('kompetensi_pelatihan.data');
+
+Route::get(
+    '/kategori-search',
+    [MasterKompetensiPelatihanController::class, 'searchKategori']
+)->name('kategori.search');
+
+Route::get(
+    '/kompetensi-search',
+    [MasterKompetensiPelatihanController::class, 'searchKompetensi']
+)->name('kompetensi.search');
+
+Route::get(
+    '/materi-search',
+    [MasterKompetensiPelatihanController::class, 'searchMateri']
+)->name('materi.search');
+
+
 // SSO Redirect via TOKEN
 Route::get('/sso-login-token', [SSOLoginController::class, 'loginWithToken']);
 

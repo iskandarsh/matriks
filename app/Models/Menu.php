@@ -11,7 +11,7 @@ class Menu extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'training_menu';
+    protected $table = 'matriks_menu';
     protected $fillable = ['name', 'route', 'order', 'parent_id'];
 
     public function children()
