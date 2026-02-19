@@ -81,7 +81,7 @@
         <aside
             x-data="{ collapsed: false }"
             :class="collapsed ? 'w-10 px-0' : 'w-80 px-4'"
-            class="bg-green-200 dark:bg-gray-800 shadow-md py-6 fixed z-40 min-h-screen transition-all duration-300 ease-in-out overflow-hidden flex flex-col justify-start relative">
+            class="bg-yellow-200 dark:bg-gray-800 shadow-md py-6 fixed z-40 min-h-screen transition-all duration-300 ease-in-out overflow-hidden flex flex-col justify-start relative">
 
 
             <!-- Logo + Collapse Button -->
@@ -114,7 +114,7 @@
                     <div class="space-y-1">
                         <h2 class="text-[16px] font-semibold tracking-tight 
         text-gray-900/90 dark:text-white/90">
-                            Training Interbat
+                            Matriks Competency
                         </h2>
 
                         <p class="text-[11px] leading-snug 
@@ -299,7 +299,7 @@
         <!-- Content Area -->
         <div class="w-full  shadow-lg rounded-lg overflow-hidden">
             <!-- Header -->
-            <header class="bg-green-200 dark:bg-gray-800 shadow">
+            <header class="bg-yellow-200 dark:bg-gray-800 shadow">
                 <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
 
 
