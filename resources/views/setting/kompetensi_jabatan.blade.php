@@ -6,7 +6,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h2 class="text-2xl font-extrabold mb-5 text-blue-500 flex items-center space-x-2 drop-shadow-sm">
                         <i class="fas fa-database text-blue-600 animate-pulse"></i>
-                        <span>Master Kompetensi Pelatihan</span>
+                        <span>Master Kompetensi Jabatan</span>
 
                     </h2>
 
@@ -43,45 +43,33 @@
 
         <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
 
-            <!-- HEADER -->
             <div class="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center">
-
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Tambah Kompetensi Pelatihan
+                    Tambah Kompetensi Jabatan
                 </h2>
 
                 <button onclick="$('#modalCreate').addClass('hidden')"
-                    class="text-gray-400 hover:text-red-500 text-xl">
-                    ✕
-                </button>
-
+                    class="text-gray-400 hover:text-red-500 text-xl">✕</button>
             </div>
 
-            <!-- BODY -->
             <form id="formCreate" class="p-6 space-y-5">
-
                 @csrf
 
-                <!-- KATEGORI -->
+                <!-- JABATAN -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Kategori <span class="text-red-500">*</span>
+                    <label class="block text-sm font-medium mb-1">
+                        Jabatan <span class="text-red-500">*</span>
                     </label>
 
-                    <select name="id_kategori"
-                        id="selectKategori"
+                    <select name="id_jabatan"
+                        id="selectJabatan"
                         required
                         class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Pilih kategori kompetensi
-                    </p>
                 </div>
-
 
                 <!-- KOMPETENSI -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="block text-sm font-medium mb-1">
                         Kompetensi <span class="text-red-500">*</span>
                     </label>
 
@@ -89,50 +77,33 @@
                         id="selectKompetensi"
                         required
                         class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Kompetensi otomatis sesuai kategori
-                    </p>
                 </div>
 
-
-                <!-- MATERI -->
+                <!-- SKALA -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Materi Pelatihan <span class="text-red-500">*</span>
+                    <label class="block text-sm font-medium mb-1">
+                        Skala (1-5) <span class="text-red-500">*</span>
                     </label>
 
-                    <select name="id_materi[]"
-                        id="selectMateri"
-                        multiple
+                    <input type="number"
+                        name="skala"
+                        min="1"
+                        max="5"
                         required
-                        class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Bisa pilih lebih dari satu materi
-                    </p>
+                        class="w-full border rounded-lg p-2 dark:bg-gray-700">
                 </div>
 
-
-                <!-- FOOTER -->
-                <div class="flex justify-end gap-3 pt-4 border-t dark:border-gray-700">
-
+                <div class="flex justify-end gap-3 pt-4 border-t">
                     <button type="button"
                         onclick="$('#modalCreate').addClass('hidden')"
-                        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                       text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-
+                        class="px-4 py-2 border rounded-lg">
                         Batal
                     </button>
 
                     <button type="submit"
-                        class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700
-                       text-white font-medium shadow">
-
-                        Simpan Data
-
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg">
+                        Simpan
                     </button>
-
                 </div>
 
             </form>
@@ -231,26 +202,23 @@
 
             setTimeout(() => {
 
-                initSelectTraining();
+                initSelectKompetensiJabatan();
 
             }, 200);
 
         });
 
-        function initSelectTraining() {
+        function initSelectKompetensiJabatan() {
 
-            // =========================
-            // KATEGORI
-            // =========================
-            $('#selectKategori').select2({
-
+            // JABATAN
+            $('#selectJabatan').select2({
                 theme: "bootstrap-5",
                 width: '100%',
                 dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih kategori",
+                placeholder: "Pilih jabatan",
 
                 ajax: {
-                    url: "{{ route('kategori.search') }}",
+                    url: "{{ route('jabatan.search') }}",
                     dataType: 'json',
                     delay: 250,
                     data: params => ({
@@ -260,84 +228,27 @@
                         results: data
                     })
                 }
-
             });
 
-
-            // =========================
-            // KOMPETENSI (TAGGING)
-            // =========================
+            // KOMPETENSI
             $('#selectKompetensi').select2({
-
                 theme: "bootstrap-5",
                 width: '100%',
                 dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih / ketik kompetensi",
-                tags: true,
+                placeholder: "Pilih kompetensi",
 
                 ajax: {
                     url: "{{ route('kompetensi.search') }}",
                     dataType: 'json',
                     delay: 250,
                     data: params => ({
-                        q: params.term,
-                        kategori: $('#selectKategori').val()
+                        q: params.term
                     }),
                     processResults: data => ({
                         results: data
                     })
                 }
-
             });
-
-
-
-            // =========================
-            // MATERI MULTIPLE
-            // =========================
-            $('#selectMateri').select2({
-
-                theme: "bootstrap-5",
-                width: '100%',
-                dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih materi pelatihan",
-                multiple: true,
-
-                ajax: {
-                    url: "{{ route('materi.search') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term,
-                        kompetensi: $('#selectKompetensi').val()
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
-
-            });
-
-
-            // =========================
-            // RESET CHAIN LOGIC
-            // =========================
-
-            // kategori berubah → reset kompetensi + materi
-            $('#selectKategori').on('change', function() {
-
-                $('#selectKompetensi').val(null).trigger('change');
-                $('#selectMateri').val(null).trigger('change');
-
-            });
-
-            // kompetensi berubah → reset materi
-            $('#selectKompetensi').on('change', function() {
-
-                $('#selectMateri').val(null).trigger('change');
-
-            });
-
         }
 
 
@@ -348,7 +259,7 @@
             const gridId = 'grid';
             const $container = $('#' + gridId);
 
-            fetch("{{ route('kompetensi_pelatihan.data') }}")
+            fetch("{{ route('kompetensi_jabatan.data') }}")
                 .then(res => res.json())
                 .then(data => {
                     const rows = data.data;
@@ -415,7 +326,9 @@
                             visible: true
                         },
 
-                        columns: [{
+                        columns: [
+
+                            {
                                 caption: 'No',
                                 width: 60,
                                 alignment: 'center',
@@ -429,9 +342,7 @@
 
                                     let index = 0;
                                     for (let i = 0; i < visibleRows.length; i++) {
-                                        if (visibleRows[i].rowType === "data") {
-                                            index++;
-                                        }
+                                        if (visibleRows[i].rowType === "data") index++;
                                         if (visibleRows[i].key === options.key) {
                                             container.text(index);
                                             break;
@@ -439,82 +350,87 @@
                                     }
                                 }
                             },
+
                             {
                                 caption: 'Departement',
-                                dataField: 'departement.depNama', // Simplifies mapping
+                                dataField: 'departement.depNama',
                                 calculateCellValue: row => row.departement?.depNama ?? '-',
-                                // groupIndex: 0 // Uncomment to group by default
-                            },
-                            {
-                                caption: 'Kategori',
-                                dataField: 'kategori.nama',
-                                calculateCellValue: row => row.kategori?.nama ?? '-',
                                 groupIndex: 0
                             },
+
+                            {
+                                caption: 'Jabatan',
+                                dataField: 'jabatan.nama',
+                                calculateCellValue: row => row.jabatan?.nama ?? '-',
+                                groupIndex: 1
+                            },
+
                             {
                                 caption: 'Kompetensi',
                                 dataField: 'kompetensi.nama',
-                                calculateCellValue: row => row.kompetensi?.nama ?? '-',
-                                groupIndex: 1
+                                calculateCellValue: row => row.kompetensi?.nama ?? '-'
                             },
+
                             {
-                                caption: 'Materi',
-                                dataField: 'materi.title',
-                                calculateCellValue: row => row.materi?.title ?? '-'
+                                caption: 'Skala',
+                                dataField: 'skala',
+                                alignment: 'center'
                             },
+
                             {
                                 caption: 'Actions',
                                 alignment: 'center',
                                 width: 120,
                                 allowGrouping: false,
-                                allowSearch: false, // Prevents searching HTML buttons
-                                cellTemplate(container, options) {
-                                    const id = options.data.id;
-                                    const $wrapper = $('<div>').addClass("flex gap-2 justify-center");
+                                allowSearch: false,
 
-                                    // if (userPermissions.edit) {
-                                    //     $('<button>')
-                                    //         .addClass('p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition')
-                                    //         .html('<i class="fas fa-edit"></i>')
-                                    //         .on('click', (e) => {
-                                    //             e.stopPropagation(); // Prevents row selection
-                                    //             openEditModal(id);
-                                    //         })
-                                    //         .appendTo($wrapper);
-                                    // }
+                                cellTemplate(container, options) {
+
+                                    const id = options.data.id;
+
+                                    const $wrapper = $('<div>').addClass("flex gap-2 justify-center");
 
                                     if (userPermissions.delete) {
 
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded hover:bg-red-700 transition')
-                                            .attr('title', 'Delete')
                                             .html('<i class="fas fa-trash"></i>')
                                             .on('click', e => {
 
                                                 e.stopPropagation();
 
-                                                if (!confirm("Yakin ingin menghapus data ini?")) return;
+                                                Swal.fire({
+                                                    title: "Yakin hapus?",
+                                                    text: "Data tidak bisa dikembalikan",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonText: "Ya hapus",
+                                                    cancelButtonText: "Batal"
+                                                }).then(result => {
 
-                                                const $btn = $(e.currentTarget);
-                                                const oldHtml = $btn.html();
+                                                    if (!result.isConfirmed) return;
 
-                                                // loading state
-                                                $btn.prop('disabled', true)
-                                                    .html('<i class="fas fa-spinner fa-spin"></i>');
+                                                    const $btn = $(e.currentTarget);
+                                                    const oldHtml = $btn.html();
 
-                                                deleteData(id)
-                                                    .finally(() => {
-                                                        $btn.prop('disabled', false).html(oldHtml);
-                                                    });
+                                                    $btn.prop('disabled', true)
+                                                        .html('<i class="fas fa-spinner fa-spin"></i>');
+
+                                                    deleteData(id)
+                                                        .finally(() => {
+                                                            $btn.prop('disabled', false).html(oldHtml);
+                                                        });
+
+                                                });
 
                                             })
                                             .appendTo($wrapper);
                                     }
 
-
                                     $wrapper.appendTo(container);
                                 }
                             }
+
                         ]
                     }).dxDataGrid('instance');
                 })
@@ -552,7 +468,7 @@
 
         function deleteData(id) {
 
-            return fetch(`kompetensi_pelatihan/${id}`, {
+            return fetch(`kompetensi_jabatan/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -568,28 +484,20 @@
         $('#formCreate').submit(function(e) {
 
             e.preventDefault();
-
             const form = this;
 
             Swal.fire({
                 title: 'Simpan data?',
                 icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, simpan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
+                showCancelButton: true
+            }).then(result => {
 
                 if (!result.isConfirmed) return;
 
-                Swal.fire({
-                    title: 'Menyimpan...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
+                Swal.showLoading();
 
                 $.ajax({
-
-                    url: "kompetensi_pelatihan",
+                    url: "{{ route('kompetensi_jabatan.store') }}",
                     type: "POST",
                     data: $(form).serialize(),
 
@@ -598,54 +506,33 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
-                            text: res.message ?? 'Data berhasil disimpan',
+                            text: res.message,
                             timer: 1500,
                             showConfirmButton: false
                         });
 
                         $('#modalCreate').addClass('hidden');
-
                         form.reset();
 
-                        // reset select2 aman
-                        $('#selectKategori').val(null).trigger('change');
+                        $('#selectJabatan').val(null).trigger('change');
                         $('#selectKompetensi').val(null).trigger('change');
-                        $('#selectMateri').val(null).trigger('change');
 
-                        if (typeof loadTable === 'function') {
-                            loadTable();
-                        }
-
+                        loadTable();
                     },
 
                     error: function(xhr) {
 
-                        let msg = 'Gagal menyimpan';
-
-                        if (xhr.responseJSON?.message) {
-                            msg = xhr.responseJSON.message;
-                        }
+                        let msg = xhr.responseJSON?.message ?? 'Gagal menyimpan';
 
                         if (xhr.responseJSON?.errors) {
-
-                            msg = Object.values(xhr.responseJSON.errors)
-                                .flat()
-                                .join('\n');
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
                         }
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: msg
-                        });
+                        Swal.fire('Error', msg, 'error');
                     }
-
                 });
-
             });
-
         });
-
 
         $('#formEditKategori').on('submit', function(e) {
 

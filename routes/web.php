@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AksesUserController;
 use App\Http\Controllers\CreateUserController;
+use App\Http\Controllers\EmployeeSettingController;
+use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MasterKategoriController;
 use App\Http\Controllers\MasterKompetensiController;
+use App\Http\Controllers\MasterKompetensiJabatanController;
 use App\Http\Controllers\MasterKompetensiPelatihanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SSOLoginController;
@@ -40,6 +43,18 @@ Route::resource('kompetensi', MasterKompetensiController::class)->middleware(['a
 Route::get('/kompetensi-data', [MasterKompetensiController::class, 'data'])->name('kompetensi.data');
 Route::resource('kompetensi_pelatihan', MasterKompetensiPelatihanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi_pelatihan.index']);
 Route::get('/kompetensi_pelatihan-data', [MasterKompetensiPelatihanController::class, 'data'])->name('kompetensi_pelatihan.data');
+Route::resource('kompetensi_jabatan', MasterKompetensiJabatanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi_jabatan.index']);
+Route::get('/kompetensi_jabatan-data', [MasterKompetensiJabatanController::class, 'data'])->name('kompetensi_jabatan.data');
+Route::get('/jabatan/search', [MasterJabatanController::class, 'search'])
+    ->name('jabatan.search');
+Route::resource('employee_setting', EmployeeSettingController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:employee_setting.index']);
+Route::get('/employee_setting-data', [EmployeeSettingController::class, 'data'])->name('employee_setting.data');
+Route::get('employee/search', [EmployeeSettingController::class, 'search'])
+    ->name('employee.search');
+Route::get('jabatan/search', [EmployeeSettingController::class, 'search'])
+    ->name('jabatan.search');
+Route::resource('jabatan', MasterJabatanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:jabatan.index']);
+Route::get('/jabatan-data', [MasterJabatanController::class, 'data'])->name('jabatan.data');
 
 Route::get(
     '/kategori-search',

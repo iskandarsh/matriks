@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\MasterKategori;
 use App\Models\MasterKompetensi;
+use App\Models\MasterKompetensiJabatan;
 use App\Models\MasterKompetensiPelatihan;
 use App\Models\TrainingMaterials;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class MasterKompetensiPelatihanController extends Controller
+class MasterKompetensiJabatanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -32,7 +33,7 @@ class MasterKompetensiPelatihanController extends Controller
     public function index()
     {
         // $this->authorize('view', [TaxStatuses::class, $this->activeMenuId]);
-        return view('setting.kompetensi_pelatihan');
+        return view('setting.kompetensi_jabatan');
     }
 
     /**
@@ -131,9 +132,6 @@ class MasterKompetensiPelatihanController extends Controller
      */
     public function store(Request $r)
     {
-        // ======================
-        // ambil employee via empToken user login
-        // ======================
         $empToken = Auth::user()->empToken;
 
         $employee = Employee::where('empToken', $empToken)->first();
@@ -144,40 +142,31 @@ class MasterKompetensiPelatihanController extends Controller
             ], 422);
         }
 
-        $departmentId = $employee->department_id;
+        $r->validate([
+            'id_jabatan' => 'required|integer',
+            'id_kompetensi' => 'required|integer',
+            'skala' => 'required|integer|min:1|max:5'
+        ]);
 
+        // cegah double
+        $exists = MasterKompetensiJabatan::where([
+            'id_jabatan' => $r->id_jabatan,
+            'id_kompetensi' => $r->id_kompetensi,
+            'id_departement' => $employee->department_id
+        ])->exists();
 
-        // ======================
-        // TAGGING kompetensi baru
-        // ======================
-        if (!is_numeric($r->id_kompetensi)) {
-
-            $k = MasterKompetensi::create([
-                'nama' => $r->id_kompetensi,
-                'id_kategori' => $r->id_kategori
-            ]);
-
-            $kompetensi_id = $k->id;
-        } else {
-
-            $kompetensi_id = $r->id_kompetensi;
+        if ($exists) {
+            return response()->json([
+                'message' => 'Kompetensi sudah ada pada jabatan ini'
+            ], 422);
         }
 
-
-        // ======================
-        // MULTIPLE materi
-        // ======================
-        foreach ($r->id_materi as $materi) {
-
-            MasterKompetensiPelatihan::create([
-
-                'id_departement' => $departmentId,   // 🔥 dari empToken
-                'id_kategori' => $r->id_kategori,
-                'id_kompetensi' => $kompetensi_id,
-                'id_materi' => $materi
-
-            ]);
-        }
+        MasterKompetensiJabatan::create([
+            'id_jabatan' => $r->id_jabatan,
+            'id_departement' => $employee->department_id,
+            'id_kompetensi' => $r->id_kompetensi,
+            'skala' => $r->skala
+        ]);
 
         return response()->json([
             'message' => 'Data berhasil disimpan'
@@ -215,58 +204,43 @@ class MasterKompetensiPelatihanController extends Controller
     {
         try {
 
-            $data = MasterKompetensiPelatihan::findOrFail($id);
+            $data = MasterKompetensiJabatan::findOrFail($id);
+
             $data->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil dihapus'
+                'message' => 'Data kompetensi jabatan berhasil dihapus'
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
         } catch (\Throwable $e) {
 
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menghapus data',
-                'error'   => $e->getMessage()
+                'error'   => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
 
-    // public function data()
-    // {
-    //     $data = MasterKompetensiPelatihan::with([
-    //         'departement',
-    //         'kompetensi',
-    //         'materi'
-    //     ])
-    //         ->latest()
-    //         ->get();
-
-    //     return response()->json([
-    //         'data' => $data,
-    //         'permissions' => [
-    //             'edit' => true,
-    //             'delete' => true
-    //         ]
-    //     ]);
-    // }
 
     public function data()
     {
-        // ambil empToken user login
         $empToken = Auth::user()->empToken;
 
-        // cari employee dari empToken
         $employee = Employee::where('empToken', $empToken)->first();
 
-        // ambil department id
         $deptId = $employee?->department_id;
 
-        $data = MasterKompetensiPelatihan::with([
+        $data = MasterKompetensiJabatan::with([
             'departement',
-            'kompetensi',
-            'materi',
-            'kategori'
+            'jabatan',
+            'kompetensi'
         ])
             ->when($deptId, fn($q) => $q->where('id_departement', $deptId))
             ->latest()

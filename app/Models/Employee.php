@@ -47,6 +47,7 @@ class Employee extends Model
         'empHrdcode',
         'level_gaji',
         'parent_id',
+        'id_kompetensi_jabatan',
     ];
 
     protected $dates = [
