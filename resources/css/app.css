@@ -1,3 +1,96 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==== FIX SELECT2 CLEAR POSITION (Tailwind + Select2) ==== */
+
+.select2-container {
+    width: 100% !important;
+}
+
+/* box utama */
+.select2-container .select2-selection--single {
+    height: 42px !important;
+    border-radius: 0.5rem !important;
+    /* rounded-lg */
+    border: 1px solid rgb(209 213 219) !important;
+    /* gray-300 */
+    background: white !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 12px !important;
+    padding-right: 42px !important;
+    transition: all .15s ease;
+}
+
+/* hover */
+.select2-container .select2-selection--single:hover {
+    border-color: rgb(156 163 175) !important;
+    /* gray-400 */
+}
+
+/* focus style breeze */
+.select2-container--focus .select2-selection--single {
+    border-color: rgb(59 130 246) !important;
+    /* blue-500 */
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.15) !important;
+}
+
+/* text */
+.select2-container .select2-selection__rendered {
+    line-height: normal !important;
+    padding-left: 0 !important;
+    color: rgb(17 24 39);
+    font-size: 14px;
+}
+
+/* placeholder */
+.select2-container .select2-selection__placeholder {
+    color: rgb(156 163 175) !important;
+}
+
+/* arrow */
+.select2-container .select2-selection__arrow {
+    height: 100% !important;
+    right: 10px !important;
+}
+
+/* tombol clear modern */
+.select2-container .select2-selection__clear {
+    position: absolute !important;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: rgb(107 114 128);
+    transition: .15s;
+}
+
+.select2-container .select2-selection__clear:hover {
+    color: rgb(239 68 68);
+}
+
+/* dropdown */
+.select2-dropdown {
+    border-radius: 0.75rem !important;
+    border: 1px solid rgb(229 231 235) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+    overflow: hidden;
+}
+
+/* option */
+.select2-results__option {
+    padding: 10px 14px !important;
+}
+
+/* option hover */
+.select2-results__option--highlighted {
+    background: rgb(59 130 246) !important;
+}
+
+/* search box dropdown */
+.select2-search__field {
+    border-radius: 0.5rem !important;
+    border: 1px solid rgb(229 231 235) !important;
+    padding: 8px !important;
+}

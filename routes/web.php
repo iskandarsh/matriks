@@ -49,7 +49,7 @@ Route::get('/jabatan/search', [MasterJabatanController::class, 'search'])
     ->name('jabatan.search');
 Route::resource('employee_setting', EmployeeSettingController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:employee_setting.index']);
 Route::get('/employee_setting-data', [EmployeeSettingController::class, 'data'])->name('employee_setting.data');
-Route::get('employee/search', [EmployeeSettingController::class, 'search'])
+Route::get('employee/search', [EmployeeSettingController::class, 'Employeesearch'])
     ->name('employee.search');
 Route::get('jabatan/search', [EmployeeSettingController::class, 'search'])
     ->name('jabatan.search');

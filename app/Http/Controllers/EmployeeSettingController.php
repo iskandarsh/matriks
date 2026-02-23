@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\EncryptHelper;
 use App\Models\Employee;
 use App\Models\EmployeeSetting;
 use App\Models\MasterJabatan;
@@ -59,7 +60,55 @@ class EmployeeSettingController extends Controller
             'text' => $d->nama
         ]);
     }
+    public function Employeesearch(Request $request)
+    {
+        $q = $request->q;
 
+        $empToken = Auth::user()->empToken;
+
+        $loginEmployee = Employee::where('empToken', $empToken)->first();
+
+        $deptId = $loginEmployee?->department_id;
+
+        $data = Employee::with('applicant') // ⭐ load relasi applicant
+            ->when($deptId, fn($x) => $x->where('department_id', $deptId))
+            ->whereNull('empDateout')   // ⭐ hanya employee aktif
+            ->limit(20)
+            ->get()
+            ->filter(function ($emp) use ($q) {
+
+                // kalau applicant kosong skip
+                if (!$emp->applicant) return false;
+
+                // decrypt nama
+                $name = EncryptHelper::decryptName(
+                    $emp->applicant->appNama,
+                    $emp->applicant->appToken
+                );
+
+                // kalau ada search keyword
+                if ($q) {
+                    return stripos($name, $q) !== false;
+                }
+
+                return true;
+            })
+            ->map(function ($emp) {
+
+                $name = EncryptHelper::decryptName(
+                    $emp->applicant->appNama,
+                    $emp->applicant->appToken
+                );
+
+                return [
+                    'id' => $emp->id,
+                    'text' => $name
+                ];
+            })
+            ->values();
+
+        return $data;
+    }
     /**
      * Show the form for creating a new resource.
      */

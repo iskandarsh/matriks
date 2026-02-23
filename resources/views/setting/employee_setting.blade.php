@@ -38,33 +38,60 @@
 
     <!-- Modal Create Position -->
     <div id="modalCreate"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 dark:bg-gray-900/90">
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
 
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md">
+        <!-- CARD -->
+        <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl shadow-2xl 
+                border border-gray-200 dark:border-gray-700 
+                animate-[fadeIn_.25s_ease]">
 
-            <form id="formCreate" method="POST" class="space-y-6">
+            <!-- HEADER -->
+            <div class="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
+
+                <div>
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        👨‍💼 Tambah Employee Setting
+                    </h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Tambahkan konfigurasi training employee baru
+                    </p>
+                </div>
+
+                <button onclick="document.getElementById('modalCreate').classList.add('hidden')"
+                    class="text-gray-400 hover:text-red-500 text-xl">
+                    ✕
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <form id="formCreate" method="POST" class="p-6 space-y-5">
                 @csrf
 
-                <h2 class="text-xl font-semibold mb-4">
-                    📂 Tambah Employee Setting
-                </h2>
-
                 <!-- EMPLOYEE -->
-                <div>
-                    <label class="block text-sm mb-1">Employee *</label>
-                    <select name="id_employee" id="selectEmployee" required class="w-full"></select>
+                <div class="space-y-1">
+                    <label class="text-sm font-medium">Employee *</label>
+                    <select name="id_employee" id="selectEmployee"
+                        class="w-full rounded-xl border-gray-300 dark:border-gray-600
+                           dark:bg-gray-900 p-3 focus:ring-2 focus:ring-blue-500">
+                    </select>
                 </div>
 
                 <!-- JABATAN -->
-                <div>
-                    <label class="block text-sm mb-1">Jabatan *</label>
-                    <select name="id_jabatan" id="selectJabatan" required class="w-full"></select>
+                <div class="space-y-1">
+                    <label class="text-sm font-medium">Jabatan *</label>
+                    <select name="id_jabatan" id="selectJabatan"
+                        class="w-full rounded-xl border-gray-300 dark:border-gray-600
+                           dark:bg-gray-900 p-3 focus:ring-2 focus:ring-blue-500">
+                    </select>
                 </div>
 
                 <!-- TYPE -->
-                <div>
-                    <label class="block text-sm mb-1">Type *</label>
-                    <select name="type" required class="w-full rounded border p-3">
+                <div class="space-y-1">
+                    <label class="text-sm font-medium">Type *</label>
+                    <select name="type"
+                        class="w-full rounded-xl border-gray-300 dark:border-gray-600
+                           dark:bg-gray-900 p-3 focus:ring-2 focus:ring-blue-500">
                         <option value="">Pilih type</option>
                         <option value="ITP">Individual Training</option>
                         <option value="PP">Program Training</option>
@@ -72,25 +99,29 @@
                 </div>
 
                 <!-- TAHUN -->
-                <div>
-                    <label class="block text-sm mb-1">Tahun Berlaku *</label>
+                <div class="space-y-1">
+                    <label class="text-sm font-medium">Tahun Berlaku *</label>
                     <input name="tahun_berlaku"
                         type="number"
                         value="{{ date('Y') }}"
-                        required
-                        class="w-full rounded border p-3">
+                        class="w-full rounded-xl border-gray-300 dark:border-gray-600
+                           dark:bg-gray-900 p-3 focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="flex justify-end gap-4 pt-6 border-t mt-6 border-gray-200 dark:border-gray-700">
+
+                <!-- FOOTER -->
+                <div class="flex justify-end gap-3 pt-6 border-t dark:border-gray-700">
 
                     <button type="button"
                         onclick="document.getElementById('modalCreate').classList.add('hidden')"
-                        class="text-gray-600 hover:text-gray-900 dark:text-gray-300">
-                        ❌ Batal
+                        class="px-5 py-2 rounded-lg border dark:border-gray-600 
+                           hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Batal
                     </button>
 
                     <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md">
-                        💾 Simpan
+                        class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 
+                           text-white font-medium shadow-lg shadow-blue-600/30">
+                        Simpan Data
                     </button>
 
                 </div>
@@ -98,7 +129,6 @@
             </form>
         </div>
     </div>
-
 
     <!-- Modal Edit Position -->
     <div id="modalEdit"
@@ -195,8 +225,9 @@
 
                 dropdownParent: $('#modalCreate'),
                 width: '100%',
+                allowClear: true, // ✅ C besar
                 placeholder: 'Pilih employee',
-
+                // theme: 'bootstrap-5',
                 ajax: {
                     url: "{{ route('employee.search') }}",
                     dataType: 'json',
@@ -219,8 +250,9 @@
 
                 dropdownParent: $('#modalCreate'),
                 width: '100%',
+                allowClear: true, // ✅ C besar
                 placeholder: 'Pilih jabatan',
-
+                // theme: 'bootstrap-5',
                 ajax: {
                     url: "{{ route('jabatan.search') }}",
                     dataType: 'json',
