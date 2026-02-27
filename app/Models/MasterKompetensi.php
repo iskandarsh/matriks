@@ -11,5 +11,5 @@ class MasterKompetensi extends Model
 
     protected $table = 'kompetensi';
 
-    protected $fillable = ['nama'];
+    protected $fillable = ['nama', 'initial', 'deskripsi'];
 }

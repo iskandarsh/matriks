@@ -66,7 +66,33 @@
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
                         placeholder="Contoh: Leadership">
                 </div>
+                <!-- Initial -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Initial <span class="text-red-500">*</span>
+                    </label>
 
+                    <input
+                        name="initial"
+                        type="text"
+                        required
+                        maxlength="10"
+                        class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
+                        placeholder="Contoh: LD">
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Deskripsi
+                    </label>
+
+                    <textarea
+                        name="deskripsi"
+                        rows="3"
+                        class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
+                        placeholder="Deskripsi kompetensi..."></textarea>
+                </div>
                 <!-- Footer -->
                 <div class="flex justify-end gap-4 pt-6 border-t mt-6 border-gray-200 dark:border-gray-700">
 
@@ -121,7 +147,33 @@
                         required
                         class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
+                <!-- Initial -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Initial <span class="text-red-500">*</span>
+                    </label>
 
+                    <input
+                        id="edit_initial"
+                        name="initial"
+                        type="text"
+                        required
+                        maxlength="10"
+                        class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Deskripsi
+                    </label>
+
+                    <textarea
+                        id="edit_deskripsi"
+                        name="deskripsi"
+                        rows="3"
+                        class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+                </div>
                 <div class="flex justify-end gap-4 pt-6 border-t mt-6">
                     <button type="button"
                         onclick="document.getElementById('modalEdit').classList.add('hidden')"
@@ -251,6 +303,17 @@
                                 alignment: 'left'
                             },
                             {
+                                dataField: 'initial',
+                                caption: 'Initial',
+                                alignment: 'center',
+                                width: 120
+                            },
+                            {
+                                dataField: 'deskripsi',
+                                caption: 'Deskripsi',
+                                alignment: 'left'
+                            },
+                            {
                                 caption: 'Actions',
                                 alignment: 'center',
                                 width: 150,
@@ -327,6 +390,8 @@
 
                     $('#edit_id').val(data.id);
                     $('#edit_nama').val(data.nama);
+                    $('#edit_initial').val(data.initial);
+                    $('#edit_deskripsi').val(data.deskripsi);
 
                     $('#modalEdit').removeClass('hidden').addClass('flex');
                 },

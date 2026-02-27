@@ -44,16 +44,20 @@ class MasterKompetensiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255|unique:kompetensi,nama'
+            'nama'       => 'required|string|max:255|unique:kompetensi,nama',
+            'initial'    => 'required|string|max:10|unique:kompetensi,initial',
+            'deskripsi'  => 'nullable|string'
         ]);
 
         $kompetensi = MasterKompetensi::create([
-            'nama' => $request->nama
+            'nama'       => $request->nama,
+            'initial'    => strtoupper($request->initial),
+            'deskripsi'  => $request->deskripsi,
         ]);
 
         return response()->json([
             'message' => 'Kompetensi berhasil disimpan',
-            'data' => $kompetensi
+            'data'    => $kompetensi
         ]);
     }
 
@@ -86,18 +90,21 @@ class MasterKompetensiController extends Controller
         $kategori = MasterKompetensi::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|max:255|unique:kompetensi,nama,' . $id
+            'nama'      => 'required|max:255|unique:kompetensi,nama,' . $id,
+            'initial'   => 'required|max:10|unique:kompetensi,initial,' . $id,
+            'deskripsi' => 'nullable|string'
         ]);
 
         $kategori->update([
-            'nama' => $request->nama
+            'nama'      => $request->nama,
+            'initial'   => strtoupper($request->initial),
+            'deskripsi' => $request->deskripsi,
         ]);
 
         return response()->json([
-            'message' => 'Kategori berhasil diupdate'
+            'message' => 'Kompetensi berhasil diupdate'
         ]);
     }
-
 
 
     /**
