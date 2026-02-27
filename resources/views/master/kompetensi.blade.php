@@ -191,7 +191,38 @@
         </div>
     </div>
 
+    <div id="modalProses"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
 
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl">
+
+            <h2 class="text-xl font-semibold mb-4">
+                ⚙️ Proses Skala Kompetensi
+            </h2>
+
+            <input type="hidden" id="proses_kompetensi_id">
+
+            <div id="detailContainer" class="space-y-3"></div>
+
+            <button id="btnAddRow"
+                class="mt-3 bg-blue-500 text-white px-4 py-2 rounded">
+                ➕ Tambah Skala
+            </button>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="$('#modalProses').addClass('hidden')"
+                    class="text-gray-600">
+                    ❌ Batal
+                </button>
+
+                <button id="btnSaveDetail"
+                    class="bg-green-600 text-white px-6 py-2 rounded">
+                    💾 Simpan
+                </button>
+            </div>
+
+        </div>
+    </div>
 
     <!-- THEME SCRIPT -->
     <script>
@@ -229,6 +260,88 @@
             loadTable();
         });
 
+        function createRow(data = {}) {
+
+            return `
+                <div class="flex gap-3 items-start detail-row border p-3 rounded">
+                    
+                    <input type="hidden" name="detail_id[]" value="${data.id ?? ''}">
+
+                    <input type="number"
+                        name="skala[]"
+                        placeholder="Skala"
+                        class="w-24 border rounded p-2"
+                        value="${data.skala ?? ''}" />
+
+                    <input type="text"
+                        name="deskripsi[]"
+                        placeholder="Pengertian"
+                        class="flex-1 border rounded p-2"
+                        value="${data.deskripsi ?? ''}" />
+
+                    <button type="button"
+                        class="btnDeleteRow bg-red-500 text-white px-3 py-1 rounded">
+                        🗑
+                    </button>
+
+                </div>
+            `;
+        }
+
+        function openProsesModal(id) {
+
+            $('#proses_kompetensi_id').val(id);
+            $('#detailContainer').html('');
+
+            $.get("{{ route('kompetensi.detail', ':id') }}".replace(':id', id), function(res) {
+
+                if (res.details.length > 0) {
+                    res.details.forEach(item => {
+                        $('#detailContainer').append(createRow(item));
+                    });
+                } else {
+                    $('#detailContainer').append(createRow());
+                }
+
+                $('#modalProses').removeClass('hidden').addClass('flex');
+            });
+        }
+
+        $('#btnAddRow').on('click', function() {
+            $('#detailContainer').append(createRow());
+        });
+
+        $(document).on('click', '.btnDeleteRow', function() {
+            $(this).closest('.detail-row').remove();
+        });
+
+        $('#btnSaveDetail').on('click', function() {
+
+            let id = $('#proses_kompetensi_id').val();
+
+            $.ajax({
+                url: "{{ route('kompetensi.detail.save', ':id') }}".replace(':id', id),
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    detail_id: $('input[name="detail_id[]"]').map(function() {
+                        return $(this).val();
+                    }).get(),
+                    skala: $('input[name="skala[]"]').map(function() {
+                        return $(this).val();
+                    }).get(),
+                    deskripsi: $('input[name="deskripsi[]"]').map(function() {
+                        return $(this).val();
+                    }).get(),
+                },
+                success: function(res) {
+
+                    Swal.fire('Berhasil', res.message, 'success');
+                    $('#modalProses').addClass('hidden');
+                }
+            });
+        });
+
         let gridInstance = null;
         const badgeClass = "inline-block rounded px-2 py-1 text-xs font-semibold";
 
@@ -254,7 +367,7 @@
                         rowAlternationEnabled: true,
                         columnAutoWidth: true,
                         columnHidingEnabled: true,
-
+                        wordWrapEnabled: true,
                         searchPanel: {
                             visible: true,
                             width: 240
@@ -319,31 +432,55 @@
                                 width: 150,
                                 cellTemplate(container, options) {
 
-                                    container.addClass("flex gap-2 justify-center");
+                                    // Center isi cell tanpa flex
+                                    container.addClass("text-center align-middle");
+
+                                    // Wrapper inline-block supaya tombol tetap sejajar & rapi
+                                    const wrapper = $('<div>')
+                                        .addClass('inline-block');
 
                                     const id = options.data.id;
 
+                                    // ===== EDIT =====
                                     if (userPermissions.edit) {
-
                                         $('<button>')
-                                            .addClass('p-2 bg-yellow-500 text-white rounded')
+                                            .addClass('p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded me-2 transition duration-200')
                                             .html('<i class="fas fa-edit"></i>')
-                                            .on('click', () => openEditModal(id))
-                                            .appendTo(container);
+                                            .attr('title', 'Edit')
+                                            .on('click', function() {
+                                                openEditModal(id);
+                                            })
+                                            .appendTo(wrapper);
                                     }
 
-                                    if (userPermissions.delete) {
-
+                                    // ===== PROSES =====
+                                    if (userPermissions.proses) {
                                         $('<button>')
-                                            .addClass('p-2 bg-red-600 text-white rounded')
+                                            .addClass('p-2 bg-green-600 hover:bg-green-700 text-white rounded me-2 transition duration-200')
+                                            .html('<i class="fas fa-cogs"></i>')
+                                            .attr('title', 'Proses')
+                                            .on('click', function() {
+                                                openProsesModal(id);
+                                            })
+                                            .appendTo(wrapper);
+                                    }
+
+                                    // ===== DELETE =====
+                                    if (userPermissions.delete) {
+                                        $('<button>')
+                                            .addClass('p-2 bg-red-600 hover:bg-red-700 text-white rounded me-2 transition duration-200')
                                             .html('<i class="fas fa-trash"></i>')
-                                            .on('click', () => {
+                                            .attr('title', 'Hapus')
+                                            .on('click', function() {
 
                                                 Swal.fire({
                                                     title: 'Hapus kompetensi?',
+                                                    text: 'Data yang dihapus tidak dapat dikembalikan.',
                                                     icon: 'warning',
                                                     showCancelButton: true,
-                                                    confirmButtonText: 'Ya'
+                                                    confirmButtonText: 'Ya, Hapus',
+                                                    cancelButtonText: 'Batal',
+                                                    confirmButtonColor: '#dc2626'
                                                 }).then(result => {
 
                                                     if (result.isConfirmed) {
@@ -355,9 +492,11 @@
                                                                 _token: $('meta[name="csrf-token"]').attr('content')
                                                             },
                                                             success(res) {
-
                                                                 Swal.fire('Berhasil', res.message, 'success');
                                                                 loadTable();
+                                                            },
+                                                            error() {
+                                                                Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data.', 'error');
                                                             }
                                                         });
 
@@ -365,9 +504,11 @@
                                                 });
 
                                             })
-                                            .appendTo(container);
+                                            .appendTo(wrapper);
                                     }
 
+                                    // Masukkan wrapper ke container
+                                    wrapper.appendTo(container);
                                 }
                             }
                         ]

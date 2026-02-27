@@ -12,4 +12,9 @@ class MasterKompetensi extends Model
     protected $table = 'kompetensi';
 
     protected $fillable = ['nama', 'initial', 'deskripsi'];
+
+    public function details()
+    {
+        return $this->hasMany(DetailKompetensi::class, 'id_kompetensi');
+    }
 }

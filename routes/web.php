@@ -55,6 +55,17 @@ Route::get('jabatan/search', [EmployeeSettingController::class, 'search'])
     ->name('jabatan.search');
 Route::resource('jabatan', MasterJabatanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:jabatan.index']);
 Route::get('/jabatan-data', [MasterJabatanController::class, 'data'])->name('jabatan.data');
+Route::prefix('kompetensi')->name('kompetensi.')->group(function () {
+
+    // Ambil detail untuk modal proses
+    Route::get('/{id}/detail', [MasterKompetensiController::class, 'getDetail'])
+        ->name('detail');
+
+    // Simpan detail dari modal proses
+    Route::post('/{id}/detail', [MasterKompetensiController::class, 'saveDetail'])
+        ->name('detail.save');
+});
+
 
 Route::get(
     '/kategori-search',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetailKompetensi;
 use App\Models\MasterKompetensi;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -117,11 +118,42 @@ class MasterKompetensiController extends Controller
         $permissions = [
             'edit'   => true,
             'delete' => true,
+            'proses' => true,
         ];
 
         return response()->json([
             'kompetensi' => $kategori,
             'permissions' => $permissions
+        ]);
+    }
+    public function saveDetail(Request $request, $id)
+    {
+        DetailKompetensi::where('id_kompetensi', $id)->delete();
+
+        foreach ($request->skala as $i => $skala) {
+
+            if (!$skala) continue;
+
+            DetailKompetensi::create([
+                'id_kompetensi' => $id,
+                'skala' => $skala,
+                'deskripsi' => $request->deskripsi[$i] ?? null
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Detail kompetensi berhasil disimpan'
+        ]);
+    }
+
+    public function getDetail($id)
+    {
+        $details = DetailKompetensi::where('id_kompetensi', $id)
+            ->orderBy('skala')
+            ->get();
+
+        return response()->json([
+            'details' => $details
         ]);
     }
 
