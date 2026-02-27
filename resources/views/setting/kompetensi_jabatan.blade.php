@@ -82,15 +82,15 @@
                 <!-- SKALA -->
                 <div>
                     <label class="block text-sm font-medium mb-1">
-                        Skala (1-5) <span class="text-red-500">*</span>
+                        Skala <span class="text-red-500">*</span>
                     </label>
 
-                    <input type="number"
-                        name="skala"
-                        min="1"
-                        max="5"
+                    <select name="skala"
+                        id="selectSkala"
                         required
-                        class="w-full border rounded-lg p-2 dark:bg-gray-700">
+                        class="w-full">
+                        <option value="">Pilih Skala</option>
+                    </select>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t">
@@ -108,57 +108,6 @@
 
             </form>
 
-        </div>
-    </div>
-
-
-
-    <!-- Modal Edit Position -->
-    <div
-        id="modalEdit"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-blue-950/60 backdrop-blur-sm p-4">
-
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md">
-
-            <form id="formEditKategori">
-                @csrf
-                @method('PUT')
-
-                <input type="hidden" id="edit_id">
-
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    ✏️ Edit Master Kompetensi
-                </h2>
-
-
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kompetensi
-                        <span class="text-red-500">*</span>
-                    </label>
-
-                    <input
-                        id="edit_nama"
-                        name="nama"
-                        type="text"
-                        required
-                        class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                </div>
-
-                <div class="flex justify-end gap-4 pt-6 border-t mt-6">
-                    <button type="button"
-                        onclick="document.getElementById('modalEdit').classList.add('hidden')"
-                        class="text-gray-600">
-                        ❌ Batal
-                    </button>
-
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                        💾 Simpan
-                    </button>
-                </div>
-
-            </form>
         </div>
     </div>
 
@@ -206,6 +155,66 @@
 
             }, 200);
 
+            $('#selectKompetensi').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih kompetensi",
+
+                ajax: {
+                    url: "{{ route('kompetensi.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
+
+            // Init Select2 Skala
+            $('#selectSkala').select2({
+                placeholder: "Pilih Skala",
+                width: '100%'
+            });
+
+            // Trigger ketika kompetensi berubah
+            $('#selectKompetensi').on('change', function() {
+
+                let id = $(this).val();
+
+                // Reset skala dulu
+                $('#selectSkala').empty().append('<option value="">Loading...</option>').trigger('change');
+
+                if (id) {
+
+                    $.ajax({
+                        url: 'kompetensi/' + id + '/skala',
+                        type: 'GET',
+                        success: function(res) {
+
+                            $('#selectSkala').empty().append('<option value="">Pilih Skala</option>');
+
+                            $.each(res, function(index, item) {
+                                $('#selectSkala').append(
+                                    `<option value="${item.skala}">
+                                ${item.skala} - ${item.deskripsi}
+                            </option>`
+                                );
+                            });
+
+                            $('#selectSkala').trigger('change');
+                        }
+                    });
+
+                } else {
+                    $('#selectSkala').empty().append('<option value="">Pilih Skala</option>').trigger('change');
+                }
+
+            });
+
         });
 
         function initSelectKompetensiJabatan() {
@@ -230,25 +239,7 @@
                 }
             });
 
-            // KOMPETENSI
-            $('#selectKompetensi').select2({
-                theme: "bootstrap-5",
-                width: '100%',
-                dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih kompetensi",
 
-                ajax: {
-                    url: "{{ route('kompetensi.search') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
-            });
         }
 
 

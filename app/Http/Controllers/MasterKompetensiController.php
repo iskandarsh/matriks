@@ -24,7 +24,14 @@ class MasterKompetensiController extends Controller
             return $next($request);
         });
     }
+    public function getSkala($id)
+    {
+        $data = DetailKompetensi::where('id_kompetensi', $id)
+            ->orderBy('skala')
+            ->get();
 
+        return response()->json($data);
+    }
     public function index()
     {
         // $this->authorize('view', [TaxStatuses::class, $this->activeMenuId]);

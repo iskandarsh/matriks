@@ -64,6 +64,8 @@ Route::prefix('kompetensi')->name('kompetensi.')->group(function () {
     // Simpan detail dari modal proses
     Route::post('/{id}/detail', [MasterKompetensiController::class, 'saveDetail'])
         ->name('detail.save');
+
+    Route::get('/{id}/skala', [MasterKompetensiController::class, 'getSkala']);
 });
 
 
