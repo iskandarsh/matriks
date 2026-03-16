@@ -62,23 +62,65 @@
 
                 @csrf
 
+
+
                 <!-- KATEGORI -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Kategori <span class="text-red-500">*</span>
                     </label>
 
+                    <select name="skema" id="skema" required class="w-full border rounded-lg p-2">
+                        <option value="">-- Pilih Skema --</option>
+                        <option value="umum">Umum</option>
+                        <option value="departement">Departement</option>
+                        <option value="jabatan">Jabatan</option>
+                        <option value="posisi">Posisi</option>
+                        <option value="workunit">Workunit</option>
+                    </select>
+                </div>
+
+                <!-- JABATAN -->
+                <div id="fieldJabatan" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Jabatan <span class="text-red-500">*</span>
+                    </label>
+
+                    <select name="id_jabatan" id="selectJabatan" class="w-full"></select>
+                </div>
+
+                <!-- POSISI -->
+                <div id="fieldPosisi" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Posisi <span class="text-red-500">*</span>
+                    </label>
+
+                    <select name="id_posisi" id="selectPosisi" class="w-full"></select>
+                </div>
+
+                <!-- WORKUNIT -->
+                <div id="fieldWorkunit" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Workunit <span class="text-red-500">*</span>
+                    </label>
+
+                    <select name="id_workunit" id="selectWorkunit" class="w-full"></select>
+
+                </div>
+                <!-- KATEGORI -->
+                <div id="fieldKategori" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+
                     <select name="id_kategori"
                         id="selectKategori"
-                        required
                         class="w-full"></select>
 
                     <p class="text-xs text-gray-400 mt-1">
                         Pilih kategori kompetensi
                     </p>
                 </div>
-
-
                 <!-- KOMPETENSI -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -234,6 +276,80 @@
                 initSelectTraining();
 
             }, 200);
+
+
+            // JABATAN
+            $('#selectJabatan').select2({
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih Jabatan",
+                width: '100%',
+                allowClear: true,
+                ajax: {
+                    url: 'dropdown/jabatan',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+
+            // POSISI
+            $('#selectPosisi').select2({
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih Posisi",
+                width: '100%',
+                allowClear: true,
+                ajax: {
+                    url: 'dropdown/posisi',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+
+            // WORKUNIT
+            $('#selectWorkunit').select2({
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih Workunit",
+                width: '100%',
+                allowClear: true,
+                ajax: {
+                    url: 'dropdown/workunit',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+
+
 
         });
 
@@ -440,12 +556,6 @@
                                 }
                             },
                             {
-                                caption: 'Departement',
-                                dataField: 'departement.depNama', // Simplifies mapping
-                                calculateCellValue: row => row.departement?.depNama ?? '-',
-                                // groupIndex: 0 // Uncomment to group by default
-                            },
-                            {
                                 caption: 'Kategori',
                                 dataField: 'kategori.nama',
                                 calculateCellValue: row => row.kategori?.nama ?? '-',
@@ -456,6 +566,26 @@
                                 dataField: 'kompetensi.nama',
                                 calculateCellValue: row => row.kompetensi?.nama ?? '-',
                                 groupIndex: 1
+                            },
+                            {
+                                caption: 'Departement',
+                                dataField: 'departement.depNama', // Simplifies mapping
+                                calculateCellValue: row => row.departement?.depNama ?? '-',
+                                // groupIndex: 0 // Uncomment to group by default
+                            }, {
+                                caption: 'Jabatan',
+                                dataField: 'peran.nama',
+                                calculateCellValue: row => row.peran?.posiNama ?? '-'
+                            },
+                            {
+                                caption: 'Posisi',
+                                dataField: 'posisi.nama',
+                                calculateCellValue: row => row.posisi?.name ?? '-'
+                            },
+                            {
+                                caption: 'Workunit',
+                                dataField: 'workunit.nama',
+                                calculateCellValue: row => row.workunit?.woruNama ?? '-'
                             },
                             {
                                 caption: 'Materi',
@@ -493,7 +623,6 @@
 
                                                 e.stopPropagation();
 
-                                                if (!confirm("Yakin ingin menghapus data ini?")) return;
 
                                                 const $btn = $(e.currentTarget);
                                                 const oldHtml = $btn.html();
@@ -552,16 +681,58 @@
 
         function deleteData(id) {
 
-            return fetch(`kompetensi_pelatihan/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            Swal.fire({
+                title: 'Hapus data?',
+                text: 'Data yang sudah dihapus tidak bisa dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6b7280'
+            }).then((result) => {
+
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: 'Menghapus...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
                     }
-                })
-                .then(r => r.json())
-                .then(() => {
-                    loadTable(); // reload grid
                 });
+
+                fetch(`ikompetensi_pelatihan/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message ?? 'Data berhasil dihapus',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        loadTable(); // reload grid
+                    })
+                    .catch(() => {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Gagal menghapus data'
+                        });
+
+                    });
+
+            });
 
         }
 
@@ -589,7 +760,7 @@
 
                 $.ajax({
 
-                    url: "kompetensi_pelatihan",
+                    url: "ikompetensi_pelatihan",
                     type: "POST",
                     data: $(form).serialize(),
 
@@ -607,10 +778,12 @@
 
                         form.reset();
 
-                        // reset select2 aman
                         $('#selectKategori').val(null).trigger('change');
                         $('#selectKompetensi').val(null).trigger('change');
                         $('#selectMateri').val(null).trigger('change');
+                        $('#selectJabatan').val(null).trigger('change');
+                        $('#selectPosisi').val(null).trigger('change');
+                        $('#selectWorkunit').val(null).trigger('change');
 
                         if (typeof loadTable === 'function') {
                             loadTable();
@@ -638,6 +811,7 @@
                             title: 'Oops...',
                             text: msg
                         });
+
                     }
 
                 });
@@ -645,6 +819,7 @@
             });
 
         });
+
 
 
         $('#formEditKategori').on('submit', function(e) {
@@ -682,6 +857,31 @@
                 }
 
             });
+
+        });
+
+        $('#skema').change(function() {
+
+            let skema = $(this).val();
+
+            $('#fieldJabatan').addClass('hidden');
+            $('#fieldPosisi').addClass('hidden');
+            $('#fieldWorkunit').addClass('hidden');
+            $('#fieldKategori').addClass('hidden');
+            if (skema != 'umum') {
+                $('#fieldKategori').removeClass('hidden');
+            }
+            if (skema == 'jabatan') {
+                $('#fieldJabatan').removeClass('hidden');
+            }
+
+            if (skema == 'posisi') {
+                $('#fieldPosisi').removeClass('hidden');
+            }
+
+            if (skema == 'workunit') {
+                $('#fieldWorkunit').removeClass('hidden');
+            }
 
         });
     </script>

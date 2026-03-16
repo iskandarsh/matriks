@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AksesUserController;
 use App\Http\Controllers\CreateUserController;
+use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\EmployeeSettingController;
 use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MenuController;
@@ -41,7 +42,7 @@ Route::resource('kategori', MasterKategoriController::class)->middleware(['auth'
 Route::get('/kategori-data', [MasterKategoriController::class, 'data'])->name('kategori.data');
 Route::resource('kompetensi', MasterKompetensiController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi.index']);
 Route::get('/kompetensi-data', [MasterKompetensiController::class, 'data'])->name('kompetensi.data');
-Route::resource('kompetensi_pelatihan', MasterKompetensiPelatihanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi_pelatihan.index']);
+Route::resource('ikompetensi_pelatihan', MasterKompetensiPelatihanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:ikompetensi_pelatihan.index']);
 Route::get('/kompetensi_pelatihan-data', [MasterKompetensiPelatihanController::class, 'data'])->name('kompetensi_pelatihan.data');
 Route::resource('kompetensi_jabatan', MasterKompetensiJabatanController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:kompetensi_jabatan.index']);
 Route::get('/kompetensi_jabatan-data', [MasterKompetensiJabatanController::class, 'data'])->name('kompetensi_jabatan.data');
@@ -84,7 +85,7 @@ Route::get(
     [MasterKompetensiPelatihanController::class, 'searchMateri']
 )->name('materi.search');
 
-
+Route::get('/dropdown/{type}', [DropdownController::class, 'select']);
 // SSO Redirect via TOKEN
 Route::get('/sso-login-token', [SSOLoginController::class, 'loginWithToken']);
 

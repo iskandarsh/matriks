@@ -12,10 +12,14 @@ class MasterKompetensiPelatihan extends Model
     protected $table = 'kompetensi_pelatihan';
 
     protected $fillable = [
-        'id_departement',
         'id_kompetensi',
         'id_materi',
         'id_kategori',   // ✅ tambah ini
+        'user_id',
+        'id_departement',
+        'id_posisi',
+        'id_peran',
+        'id_workunit'
     ];
 
     protected $dates = ['deleted_at'];
@@ -45,5 +49,20 @@ class MasterKompetensiPelatihan extends Model
     public function kategori()
     {
         return $this->belongsTo(MasterKategori::class, 'id_kategori');
+    }
+
+    public function posisi()
+    {
+        return $this->belongsTo(Peran::class, 'id_posisi');
+    }
+
+    public function peran()
+    {
+        return $this->belongsTo(Position::class, 'id_peran');
+    }
+
+    public function workunit()
+    {
+        return $this->belongsTo(Workunit::class, 'id_workunit');
     }
 }

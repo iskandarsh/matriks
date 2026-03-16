@@ -131,9 +131,13 @@ class MasterKompetensiPelatihanController extends Controller
      */
     public function store(Request $r)
     {
-        // ======================
-        // ambil employee via empToken user login
-        // ======================
+
+        $r->validate([
+            'skema' => 'required',
+            'id_kompetensi' => 'required',
+            'id_materi' => 'required|array'
+        ]);
+
         $empToken = Auth::user()->empToken;
 
         $employee = Employee::where('empToken', $empToken)->first();
@@ -144,7 +148,12 @@ class MasterKompetensiPelatihanController extends Controller
             ], 422);
         }
 
-        $departmentId = $employee->department_id;
+        // ======================
+        // Tentukan kategori
+        // ======================
+        $kategori_id = $r->skema == 'umum'
+            ? 3
+            : $r->id_kategori;
 
 
         // ======================
@@ -154,7 +163,7 @@ class MasterKompetensiPelatihanController extends Controller
 
             $k = MasterKompetensi::create([
                 'nama' => $r->id_kompetensi,
-                'id_kategori' => $r->id_kategori
+                'id_kategori' => $kategori_id
             ]);
 
             $kompetensi_id = $k->id;
@@ -165,25 +174,47 @@ class MasterKompetensiPelatihanController extends Controller
 
 
         // ======================
-        // MULTIPLE materi
+        // MULTIPLE MATERI
         // ======================
         foreach ($r->id_materi as $materi) {
 
-            MasterKompetensiPelatihan::create([
+            $data = [
 
-                'id_departement' => $departmentId,   // 🔥 dari empToken
-                'id_kategori' => $r->id_kategori,
-                'id_kompetensi' => $kompetensi_id,
-                'id_materi' => $materi
+                'id_kategori'    => $kategori_id,
+                'id_kompetensi'  => $kompetensi_id,
+                'id_materi'      => $materi,
 
-            ]);
+                'user_id'        => Auth::id(),
+
+                'id_departement' => $r->skema != 'umum'
+                    ? $employee->department_id
+                    : null,
+
+                'id_posisi'      => $r->id_posisi ?? null,
+                'id_peran'       => $r->id_jabatan ?? null,
+                'id_workunit'    => $r->id_workunit ?? null
+
+            ];
+
+            // ======================
+            // CEK DUPLIKAT
+            // ======================
+            $exist = MasterKompetensiPelatihan::where($data)->exists();
+
+            if ($exist) {
+                continue;
+            }
+
+            // ======================
+            // INSERT DATA
+            // ======================
+            MasterKompetensiPelatihan::create($data);
         }
 
         return response()->json([
             'message' => 'Data berhasil disimpan'
         ]);
     }
-
     /**
      * Display the specified resource.
      */
@@ -253,22 +284,21 @@ class MasterKompetensiPelatihanController extends Controller
 
     public function data()
     {
-        // ambil empToken user login
         $empToken = Auth::user()->empToken;
 
-        // cari employee dari empToken
         $employee = Employee::where('empToken', $empToken)->first();
 
-        // ambil department id
         $deptId = $employee?->department_id;
 
         $data = MasterKompetensiPelatihan::with([
-            'departement',
             'kompetensi',
             'materi',
-            'kategori'
+            'departement',
+            'kategori',
+            'posisi',
+            'peran',
+            'workunit'
         ])
-            ->when($deptId, fn($q) => $q->where('id_departement', $deptId))
             ->latest()
             ->get();
 
