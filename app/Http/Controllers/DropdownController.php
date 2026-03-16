@@ -17,27 +17,32 @@ class DropdownController extends Controller
 
         switch ($type) {
 
-            // JABATAN (Position)
             case 'jabatan':
                 $query = Position::select('id', 'posiNama as nama');
+
+                if ($search) {
+                    $query->where('posiNama', 'ILIKE', "%$search%");
+                }
                 break;
 
-            // POSISI (Peran)
             case 'posisi':
                 $query = Peran::select('id', 'name as nama');
+
+                if ($search) {
+                    $query->where('name', 'ILIKE', "%$search%");
+                }
                 break;
 
-            // WORKUNIT
             case 'workunit':
                 $query = Workunit::select('id', 'woruNama as nama');
+
+                if ($search) {
+                    $query->where('woruNama', 'ILIKE', "%$search%");
+                }
                 break;
 
             default:
                 return response()->json([]);
-        }
-
-        if ($search) {
-            $query->where('nama', 'like', '%' . $search . '%');
         }
 
         $data = $query->limit(10)->get();
