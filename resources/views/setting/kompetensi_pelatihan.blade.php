@@ -575,12 +575,12 @@
                             }, {
                                 caption: 'Jabatan',
                                 dataField: 'peran.nama',
-                                calculateCellValue: row => row.peran?.posiNama ?? '-'
+                                calculateCellValue: row => row.posisi?.posiNama ?? '-'
                             },
                             {
                                 caption: 'Posisi',
                                 dataField: 'posisi.nama',
-                                calculateCellValue: row => row.posisi?.name ?? '-'
+                                calculateCellValue: row => row.peran?.name ?? '-'
                             },
                             {
                                 caption: 'Workunit',

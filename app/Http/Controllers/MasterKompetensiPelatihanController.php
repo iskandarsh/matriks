@@ -190,8 +190,8 @@ class MasterKompetensiPelatihanController extends Controller
                     ? $employee->department_id
                     : null,
 
-                'id_posisi'      => $r->id_posisi ?? null,
-                'id_peran'       => $r->id_jabatan ?? null,
+                'id_posisi'      => $r->id_jabatan ?? null,
+                'id_peran'       => $r->id_posisi ?? null,
                 'id_workunit'    => $r->id_workunit ?? null
 
             ];

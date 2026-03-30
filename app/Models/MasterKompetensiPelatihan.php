@@ -53,12 +53,12 @@ class MasterKompetensiPelatihan extends Model
 
     public function posisi()
     {
-        return $this->belongsTo(Peran::class, 'id_posisi');
+        return $this->belongsTo(Position::class, 'id_posisi');
     }
 
     public function peran()
     {
-        return $this->belongsTo(Position::class, 'id_peran');
+        return $this->belongsTo(Peran::class, 'id_peran');
     }
 
     public function workunit()
