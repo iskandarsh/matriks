@@ -80,22 +80,23 @@
                     </select>
                 </div>
 
-                <!-- JABATAN -->
                 <div id="fieldJabatan" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Jabatan <span class="text-red-500">*</span>
                     </label>
 
-                    <select name="id_jabatan" id="selectJabatan" class="w-full"></select>
+                    <select name="id_jabatan[]" id="selectJabatan" class="w-full" multiple></select>
                 </div>
 
+
                 <!-- POSISI -->
+
                 <div id="fieldPosisi" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Posisi <span class="text-red-500">*</span>
                     </label>
 
-                    <select name="id_posisi" id="selectPosisi" class="w-full"></select>
+                    <select name="id_posisi[]" id="selectPosisi" class="w-full" multiple></select>
                 </div>
 
                 <!-- WORKUNIT -->
@@ -104,8 +105,7 @@
                         Workunit <span class="text-red-500">*</span>
                     </label>
 
-                    <select name="id_workunit" id="selectWorkunit" class="w-full"></select>
-
+                    <select name="id_workunit[]" id="selectWorkunit" class="w-full" multiple></select>
                 </div>
                 <!-- KATEGORI -->
                 <div id="fieldKategori" class="hidden">
@@ -124,12 +124,12 @@
                 <!-- KOMPETENSI -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Kompetensi <span class="text-red-500">*</span>
+                        Kompetensi
                     </label>
 
                     <select name="id_kompetensi"
                         id="selectKompetensi"
-                        required
+
                         class="w-full"></select>
 
                     <p class="text-xs text-gray-400 mt-1">
@@ -282,8 +282,10 @@
             $('#selectJabatan').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Jabatan",
+                theme: "bootstrap-5",
                 width: '100%',
                 allowClear: true,
+                multiple: true, // optional (auto detect dari HTML)
                 ajax: {
                     url: 'dropdown/jabatan',
                     dataType: 'json',
@@ -306,8 +308,10 @@
             $('#selectPosisi').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Posisi",
+                theme: "bootstrap-5",
                 width: '100%',
                 allowClear: true,
+                multiple: true,
                 ajax: {
                     url: 'dropdown/posisi',
                     dataType: 'json',
@@ -325,13 +329,14 @@
                 }
             });
 
-
             // WORKUNIT
             $('#selectWorkunit').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Workunit",
+                theme: "bootstrap-5",
                 width: '100%',
                 allowClear: true,
+                multiple: true,
                 ajax: {
                     url: 'dropdown/workunit',
                     dataType: 'json',
@@ -781,10 +786,13 @@
                         $('#selectKategori').val(null).trigger('change');
                         $('#selectKompetensi').val(null).trigger('change');
                         $('#selectMateri').val(null).trigger('change');
+                        $('#fieldJabatan').addClass('hidden');
                         $('#selectJabatan').val(null).trigger('change');
+                        $('#fieldPosisi').addClass('hidden');
                         $('#selectPosisi').val(null).trigger('change');
-                        $('#selectWorkunit').val(null).trigger('change');
 
+                        $('#fieldWorkunit').addClass('hidden');
+                        $('#selectWorkunit').val(null).trigger('change');
                         if (typeof loadTable === 'function') {
                             loadTable();
                         }
