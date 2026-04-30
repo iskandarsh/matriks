@@ -19,7 +19,8 @@ class MasterKompetensiPelatihan extends Model
         'id_departement',
         'id_posisi',
         'id_peran',
-        'id_workunit'
+        'id_workunit',
+        'nilai',
     ];
 
     protected $dates = ['deleted_at'];

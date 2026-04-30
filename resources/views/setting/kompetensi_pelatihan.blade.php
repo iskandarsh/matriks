@@ -37,149 +37,6 @@
         </div>
     </div>
 
-    <!-- Modal Create Position -->
-    <!-- <div id="modalCreate"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-
-        <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
-
-        
-            <div class="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center">
-
-                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Tambah Kompetensi Pelatihan
-                </h2>
-
-                <button onclick="$('#modalCreate').addClass('hidden')"
-                    class="text-gray-400 hover:text-red-500 text-xl">
-                    ✕
-                </button>
-
-            </div>
-
-         
-            <form id="formCreate" class="p-6 space-y-5">
-
-                @csrf
-
-
-
-              
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Kategori <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="skema" id="skema" required class="w-full border rounded-lg p-2">
-                        <option value="">-- Pilih Skema --</option>
-                        <option value="umum">Umum</option>
-                        <option value="departement">Departement</option>
-                        <option value="jabatan">Jabatan</option>
-                        <option value="posisi">Posisi</option>
-                        <option value="workunit">Workunit</option>
-                    </select>
-                </div>
-
-                <div id="fieldJabatan" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jabatan <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="id_jabatan[]" id="selectJabatan" class="w-full" multiple></select>
-                </div>
-
-
-
-                <div id="fieldPosisi" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Posisi <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="id_posisi[]" id="selectPosisi" class="w-full" multiple></select>
-                </div>
-
-  
-                <div id="fieldWorkunit" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Workunit <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="id_workunit[]" id="selectWorkunit" class="w-full" multiple></select>
-                </div>
-        
-                <div id="fieldKategori" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Kategori <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="id_kategori"
-                        id="selectKategori"
-                        class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Pilih kategori kompetensi
-                    </p>
-                </div>
-        
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Kompetensi
-                    </label>
-
-                    <select name="id_kompetensi"
-                        id="selectKompetensi"
-
-                        class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Kompetensi otomatis sesuai kategori
-                    </p>
-                </div>
-
-
-           
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Materi Pelatihan <span class="text-red-500">*</span>
-                    </label>
-
-                    <select name="id_materi[]"
-                        id="selectMateri"
-                        multiple
-                        required
-                        class="w-full"></select>
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Bisa pilih lebih dari satu materi
-                    </p>
-                </div>
-
-
-
-                <div class="flex justify-end gap-3 pt-4 border-t dark:border-gray-700">
-
-                    <button type="button"
-                        onclick="$('#modalCreate').addClass('hidden')"
-                        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                       text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-
-                        Batal
-                    </button>
-
-                    <button type="submit"
-                        class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700
-                       text-white font-medium shadow">
-
-                        Simpan Data
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-    </div> -->
 
     <div id="modalCreate"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-4">
@@ -260,54 +117,7 @@
 
         </div>
     </div>
-    <!-- Modal Edit Position -->
-    <div
-        id="modalEdit"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-blue-950/60 backdrop-blur-sm p-4">
 
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md">
-
-            <form id="formEditKategori">
-                @csrf
-                @method('PUT')
-
-                <input type="hidden" id="edit_id">
-
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    ✏️ Edit Master Kompetensi
-                </h2>
-
-
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kompetensi
-                        <span class="text-red-500">*</span>
-                    </label>
-
-                    <input
-                        id="edit_nama"
-                        name="nama"
-                        type="text"
-                        required
-                        class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                </div>
-
-                <div class="flex justify-end gap-4 pt-6 border-t mt-6">
-                    <button type="button"
-                        onclick="document.getElementById('modalEdit').classList.add('hidden')"
-                        class="text-gray-600">
-                        ❌ Batal
-                    </button>
-
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                        💾 Simpan
-                    </button>
-                </div>
-
-            </form>
-        </div>
-    </div>
 
 
 
@@ -511,7 +321,7 @@
                                 </div>
 
                             </div>
-`;
+                        `;
                     });
 
                     $('#kompetensiList').html(html);
@@ -910,11 +720,31 @@
 
         }
 
-        $('#formCreate').submit(function(e) {
-
+        $('#formCreate').on('submit', function(e) {
             e.preventDefault();
 
             const form = this;
+            const submitBtn = $('[form="formCreate"]');
+
+            // validasi sederhana: pastikan semua nilai kompetensi sudah dipilih
+            let isValid = true;
+            $('select[name="detail_kompetensi_id[]"]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('border-red-500');
+                } else {
+                    $(this).removeClass('border-red-500');
+                }
+            });
+
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Lengkapi data',
+                    text: 'Semua nilai kompetensi wajib dipilih.'
+                });
+                return;
+            }
 
             Swal.fire({
                 title: 'Simpan data?',
@@ -923,7 +753,6 @@
                 confirmButtonText: 'Ya, simpan',
                 cancelButtonText: 'Batal'
             }).then((result) => {
-
                 if (!result.isConfirmed) return;
 
                 Swal.fire({
@@ -932,14 +761,21 @@
                     didOpen: () => Swal.showLoading()
                 });
 
-                $.ajax({
+                const formData = new FormData(form);
 
+                $.ajax({
                     url: "ikompetensi_pelatihan",
                     type: "POST",
-                    data: $(form).serialize(),
-
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Menyimpan...');
+                    },
                     success: function(res) {
-
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
@@ -951,25 +787,19 @@
                         $('#modalCreate').addClass('hidden');
 
                         form.reset();
+                        $('#kompetensiList').html('');
+                        $('#kompetensiWrapper').addClass('hidden');
 
                         $('#selectKategori').val(null).trigger('change');
-                        $('#selectKompetensi').val(null).trigger('change');
-                        $('#selectMateri').val(null).trigger('change');
-                        $('#fieldJabatan').addClass('hidden');
                         $('#selectJabatan').val(null).trigger('change');
-                        $('#fieldPosisi').addClass('hidden');
                         $('#selectPosisi').val(null).trigger('change');
-
-                        $('#fieldWorkunit').addClass('hidden');
                         $('#selectWorkunit').val(null).trigger('change');
+
                         if (typeof loadTable === 'function') {
                             loadTable();
                         }
-
                     },
-
                     error: function(xhr) {
-
                         let msg = 'Gagal menyimpan';
 
                         if (xhr.responseJSON?.message) {
@@ -977,10 +807,7 @@
                         }
 
                         if (xhr.responseJSON?.errors) {
-
-                            msg = Object.values(xhr.responseJSON.errors)
-                                .flat()
-                                .join('\n');
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
                         }
 
                         Swal.fire({
@@ -988,15 +815,13 @@
                             title: 'Oops...',
                             text: msg
                         });
-
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text('Simpan');
                     }
-
                 });
-
             });
-
         });
-
 
 
         $('#formEditKategori').on('submit', function(e) {

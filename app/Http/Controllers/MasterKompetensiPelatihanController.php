@@ -10,6 +10,7 @@ use App\Models\TrainingMaterials;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MasterKompetensiPelatihanController extends Controller
 {
@@ -216,20 +217,130 @@ class MasterKompetensiPelatihanController extends Controller
     //     ]);
     // }
 
-    public function store(Request $r)
-    {
-        $r->validate([
-            'skema' => 'required',
-            'id_kompetensi' => 'nullable',
-            'id_materi' => 'required|array',
+    // public function store(Request $r)
+    // {
+    //     $r->validate([
+    //         'skema' => 'required',
+    //         'id_kompetensi' => 'nullable',
+    //         'id_materi' => 'required|array',
 
-            'id_jabatan' => 'nullable|array',
-            'id_posisi' => 'nullable|array',
-            'id_workunit' => 'nullable|array',
+    //         'id_jabatan' => 'nullable|array',
+    //         'id_posisi' => 'nullable|array',
+    //         'id_workunit' => 'nullable|array',
+    //     ]);
+
+    //     $empToken = Auth::user()->empToken;
+
+    //     $employee = Employee::where('empToken', $empToken)->first();
+
+    //     if (!$employee) {
+    //         return response()->json([
+    //             'message' => 'Employee tidak ditemukan'
+    //         ], 422);
+    //     }
+
+    //     // ======================
+    //     // Tentukan kategori
+    //     // ======================
+    //     $kategori_id = $r->skema == 'umum'
+    //         ? 3
+    //         : $r->id_kategori;
+
+    //     // ======================
+    //     // TAGGING kompetensi baru
+    //     // ======================
+    //     if (!is_numeric($r->id_kompetensi)) {
+
+    //         $k = MasterKompetensi::create([
+    //             'nama' => $r->id_kompetensi,
+    //             'id_kategori' => $kategori_id
+    //         ]);
+
+    //         $kompetensi_id = $k->id;
+    //     } else {
+
+    //         $kompetensi_id = $r->id_kompetensi;
+    //     }
+
+    //     // ======================
+    //     // NORMALISASI DATA MULTIPLE
+    //     // ======================
+    //     $jabatanList  = $r->id_jabatan ?? [null];
+    //     $peranList    = $r->id_posisi ?? [null];
+    //     $workunitList = $r->id_workunit ?? [null];
+
+    //     // kalau skema umum → semua null
+    //     if ($r->skema == 'umum') {
+    //         $jabatanList  = [null];
+    //         $peranList    = [null];
+    //         $workunitList = [null];
+    //     }
+
+    //     // ======================
+    //     // LOOP INSERT (COMBINATION)
+    //     // ======================
+    //     foreach ($r->id_materi as $materi) {
+
+    //         foreach ($jabatanList as $jabatan) {
+    //             foreach ($peranList as $peran) {
+    //                 foreach ($workunitList as $workunit) {
+
+    //                     $data = [
+
+    //                         'id_kategori'    => $kategori_id,
+    //                         'id_kompetensi'  => $kompetensi_id,
+    //                         'id_materi'      => $materi,
+
+    //                         'user_id'        => Auth::id(),
+
+    //                         'id_departement' => $r->skema != 'umum'
+    //                             ? $employee->department_id
+    //                             : null,
+
+    //                         'id_posisi'      => $jabatan,
+    //                         'id_peran'       => $peran,
+    //                         'id_workunit'    => $workunit
+
+    //                     ];
+
+    //                     // ======================
+    //                     // CEK DUPLIKAT
+    //                     // ======================
+    //                     $exist = MasterKompetensiPelatihan::where($data)->exists();
+
+    //                     if ($exist) continue;
+
+    //                     // ======================
+    //                     // INSERT
+    //                     // ======================
+    //                     MasterKompetensiPelatihan::create($data);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Data berhasil disimpan'
+    //     ]);
+    // }
+
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_kategori' => 'required|integer',
+            'id_jabatan' => 'nullable|integer',
+            'id_posisi' => 'nullable|integer',
+            'id_workunit' => 'nullable|integer',
+
+            'kompetensi_id' => 'required|array|min:1',
+            'kompetensi_id.*' => 'required|integer',
+
+            'detail_kompetensi_id' => 'required|array|min:1',
+            'detail_kompetensi_id.*' => 'required|integer',
         ]);
 
         $empToken = Auth::user()->empToken;
-
         $employee = Employee::where('empToken', $empToken)->first();
 
         if (!$employee) {
@@ -238,90 +349,51 @@ class MasterKompetensiPelatihanController extends Controller
             ], 422);
         }
 
-        // ======================
-        // Tentukan kategori
-        // ======================
-        $kategori_id = $r->skema == 'umum'
-            ? 3
-            : $r->id_kategori;
+        DB::beginTransaction();
 
-        // ======================
-        // TAGGING kompetensi baru
-        // ======================
-        if (!is_numeric($r->id_kompetensi)) {
+        try {
+            foreach ($validated['kompetensi_id'] as $index => $kompetensiId) {
+                $detailId = $validated['detail_kompetensi_id'][$index] ?? null;
 
-            $k = MasterKompetensi::create([
-                'nama' => $r->id_kompetensi,
-                'id_kategori' => $kategori_id
-            ]);
-
-            $kompetensi_id = $k->id;
-        } else {
-
-            $kompetensi_id = $r->id_kompetensi;
-        }
-
-        // ======================
-        // NORMALISASI DATA MULTIPLE
-        // ======================
-        $jabatanList  = $r->id_jabatan ?? [null];
-        $peranList    = $r->id_posisi ?? [null];
-        $workunitList = $r->id_workunit ?? [null];
-
-        // kalau skema umum → semua null
-        if ($r->skema == 'umum') {
-            $jabatanList  = [null];
-            $peranList    = [null];
-            $workunitList = [null];
-        }
-
-        // ======================
-        // LOOP INSERT (COMBINATION)
-        // ======================
-        foreach ($r->id_materi as $materi) {
-
-            foreach ($jabatanList as $jabatan) {
-                foreach ($peranList as $peran) {
-                    foreach ($workunitList as $workunit) {
-
-                        $data = [
-
-                            'id_kategori'    => $kategori_id,
-                            'id_kompetensi'  => $kompetensi_id,
-                            'id_materi'      => $materi,
-
-                            'user_id'        => Auth::id(),
-
-                            'id_departement' => $r->skema != 'umum'
-                                ? $employee->department_id
-                                : null,
-
-                            'id_posisi'      => $jabatan,
-                            'id_peran'       => $peran,
-                            'id_workunit'    => $workunit
-
-                        ];
-
-                        // ======================
-                        // CEK DUPLIKAT
-                        // ======================
-                        $exist = MasterKompetensiPelatihan::where($data)->exists();
-
-                        if ($exist) continue;
-
-                        // ======================
-                        // INSERT
-                        // ======================
-                        MasterKompetensiPelatihan::create($data);
-                    }
+                if (!$detailId) {
+                    continue;
                 }
-            }
-        }
 
-        return response()->json([
-            'message' => 'Data berhasil disimpan'
-        ]);
+                $data = [
+                    'id_kategori'    => $validated['id_kategori'],
+                    'id_kompetensi'  => $kompetensiId,
+                    'id_detail_kompetensi' => $detailId, // ganti kalau nama kolommu beda
+                    'id_jabatan'     => $validated['id_jabatan'] ?? null,
+                    'id_posisi'      => $validated['id_posisi'] ?? null,
+                    'id_workunit'    => $validated['id_workunit'] ?? null,
+                    'user_id'        => Auth::id(),
+                    'id_departement' => $employee->department_id ?? null,
+                ];
+
+                $exists = MasterKompetensiPelatihan::where($data)->exists();
+                if ($exists) {
+                    continue;
+                }
+
+                MasterKompetensiPelatihan::create($data);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Data berhasil disimpan'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menyimpan data'
+            ], 500);
+        }
     }
+
+
     /**
      * Display the specified resource.
      */
