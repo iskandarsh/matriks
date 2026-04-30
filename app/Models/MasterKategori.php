@@ -25,4 +25,9 @@ class MasterKategori extends Model
 
     // Kolom soft delete
     protected $dates = ['deleted_at'];
+
+    public function kompetensi()
+    {
+        return $this->hasMany(MasterKompetensi::class, 'kategori_id');
+    }
 }

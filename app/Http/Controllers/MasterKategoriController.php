@@ -23,7 +23,18 @@ class MasterKategoriController extends Controller
             return $next($request);
         });
     }
+    public function select(Request $request)
+    {
+        $search = $request->search;
 
+        $data = MasterKategori::when($search, function ($query) use ($search) {
+            $query->where('nama', 'like', "%{$search}%");
+        })
+            ->limit(10)
+            ->get();
+
+        return response()->json($data);
+    }
     public function index()
     {
         // $this->authorize('view', [TaxStatuses::class, $this->activeMenuId]);

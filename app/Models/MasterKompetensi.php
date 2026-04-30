@@ -11,10 +11,21 @@ class MasterKompetensi extends Model
 
     protected $table = 'kompetensi';
 
-    protected $fillable = ['nama', 'initial', 'deskripsi'];
+    protected $fillable = [
+        'nama',
+        'initial',
+        'deskripsi',
+        'kategori_id' // 🔥 tambahin ini
+    ];
 
     public function details()
     {
         return $this->hasMany(DetailKompetensi::class, 'id_kompetensi');
+    }
+
+    // Relasi ke kategori
+    public function kategori()
+    {
+        return $this->belongsTo(MasterKategori::class, 'kategori_id');
     }
 }

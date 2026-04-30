@@ -52,15 +52,17 @@ class MasterKompetensiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'       => 'required|string|max:255|unique:kompetensi,nama',
-            'initial'    => 'required|string|max:10|unique:kompetensi,initial',
-            'deskripsi'  => 'nullable|string'
+            'kategori_id' => 'required|exists:kategori,id', // 🔥 ini baru
+            'nama'        => 'required|string|max:255|unique:kompetensi,nama',
+            'initial'     => 'required|string|max:10|unique:kompetensi,initial',
+            'deskripsi'   => 'nullable|string'
         ]);
 
         $kompetensi = MasterKompetensi::create([
-            'nama'       => $request->nama,
-            'initial'    => strtoupper($request->initial),
-            'deskripsi'  => $request->deskripsi,
+            'kategori_id' => $request->kategori_id, // 🔥 simpan ke DB
+            'nama'        => $request->nama,
+            'initial'     => strtoupper($request->initial),
+            'deskripsi'   => $request->deskripsi,
         ]);
 
         return response()->json([
@@ -75,11 +77,10 @@ class MasterKompetensiController extends Controller
      */
     public function show($id)
     {
-        $kategori = MasterKompetensi::findOrFail($id);
+        $kompetensi = MasterKompetensi::with('kategori')->findOrFail($id);
 
-        return response()->json($kategori);
+        return response()->json($kompetensi);
     }
-
 
 
     /**
@@ -95,18 +96,20 @@ class MasterKompetensiController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $kategori = MasterKompetensi::findOrFail($id);
+        $kompetensi = MasterKompetensi::findOrFail($id);
 
         $request->validate([
-            'nama'      => 'required|max:255|unique:kompetensi,nama,' . $id,
-            'initial'   => 'required|max:10|unique:kompetensi,initial,' . $id,
-            'deskripsi' => 'nullable|string'
+            'kategori_id' => 'required|exists:kategori,id', // 🔥 baru
+            'nama'        => 'required|max:255|unique:kompetensi,nama,' . $id,
+            'initial'     => 'required|max:10|unique:kompetensi,initial,' . $id,
+            'deskripsi'   => 'nullable|string'
         ]);
 
-        $kategori->update([
-            'nama'      => $request->nama,
-            'initial'   => strtoupper($request->initial),
-            'deskripsi' => $request->deskripsi,
+        $kompetensi->update([
+            'kategori_id' => $request->kategori_id, // 🔥 simpan
+            'nama'        => $request->nama,
+            'initial'     => strtoupper($request->initial),
+            'deskripsi'   => $request->deskripsi,
         ]);
 
         return response()->json([
@@ -120,7 +123,9 @@ class MasterKompetensiController extends Controller
      */
     public function data()
     {
-        $kategori = MasterKompetensi::orderBy('nama', 'asc')->get();
+        $kompetensi = MasterKompetensi::with('kategori') // 🔥 ini penting
+            ->orderBy('nama', 'asc')
+            ->get();
 
         $permissions = [
             'edit'   => true,
@@ -129,7 +134,7 @@ class MasterKompetensiController extends Controller
         ];
 
         return response()->json([
-            'kompetensi' => $kategori,
+            'kompetensi' => $kompetensi,
             'permissions' => $permissions
         ]);
     }

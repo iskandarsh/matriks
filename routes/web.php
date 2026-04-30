@@ -69,6 +69,7 @@ Route::prefix('kompetensi')->name('kompetensi.')->group(function () {
     Route::get('/{id}/skala', [MasterKompetensiController::class, 'getSkala']);
 });
 
+Route::get('/kategori-select/select', [MasterKategoriController::class, 'select']);
 
 Route::get(
     '/kategori-search',

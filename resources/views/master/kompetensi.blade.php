@@ -93,6 +93,18 @@
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
                         placeholder="Deskripsi kompetensi..."></textarea>
                 </div>
+
+                <!-- Kategori -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+
+                    <select name="kategori_id" id="kategori_id"
+                        class="w-full"
+                        required>
+                    </select>
+                </div>
                 <!-- Footer -->
                 <div class="flex justify-end gap-4 pt-6 border-t mt-6 border-gray-200 dark:border-gray-700">
 
@@ -174,6 +186,16 @@
                         rows="3"
                         class="w-full border border-gray-300 rounded-xl p-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
                 </div>
+
+                <!-- Kategori -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+
+                    <select name="kategori_id" id="edit_kategori_id" class="w-full" required></select>
+                </div>
+
                 <div class="flex justify-end gap-4 pt-6 border-t mt-6">
                     <button type="button"
                         onclick="document.getElementById('modalEdit').classList.add('hidden')"
@@ -255,6 +277,55 @@
             $('#btnCancel').on('click', function() {
                 $('#modalCreate').addClass('hidden').removeClass('flex');
                 $('#formCreate')[0].reset();
+            });
+            $('#kategori_id').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih kategori...',
+                dropdownParent: $('#modalCreate'), // biar muncul di dalam modal
+                ajax: {
+                    url: 'kategori-select/select', // endpoint
+                    type: 'GET',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            search: params.term // keyword
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.nama
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#edit_kategori_id').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih kategori...',
+                dropdownParent: $('#modalEdit'),
+                ajax: {
+                    url: 'kategori-select/select',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            search: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.nama
+                            }))
+                        };
+                    }
+                }
             });
 
             loadTable();
@@ -427,6 +498,23 @@
                                 alignment: 'left'
                             },
                             {
+                                dataField: 'kategori.nama', // 🔥 ambil dari relasi
+                                caption: 'Kategori',
+                                alignment: 'center',
+                                width: 180,
+                                cellTemplate(container, options) {
+
+                                    const kategori = options.data.kategori?.nama ?? '-';
+
+                                    // Badge biar keren 😎
+                                    const badge = $('<span>')
+                                        .addClass('px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700')
+                                        .text(kategori);
+
+                                    container.append(badge);
+                                }
+                            },
+                            {
                                 caption: 'Actions',
                                 alignment: 'center',
                                 width: 150,
@@ -534,6 +622,16 @@
                     $('#edit_initial').val(data.initial);
                     $('#edit_deskripsi').val(data.deskripsi);
 
+                    // 🔥 SET SELECT2 VALUE
+                    if (data.kategori_id) {
+
+                        let option = new Option(data.kategori?.nama ?? 'Kategori', data.kategori_id, true, true);
+                        $('#edit_kategori_id').append(option).trigger('change');
+
+                    } else {
+                        $('#edit_kategori_id').val(null).trigger('change');
+                    }
+
                     $('#modalEdit').removeClass('hidden').addClass('flex');
                 },
 
@@ -541,13 +639,12 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: 'Gagal mengambil data kategori.'
+                        text: 'Gagal mengambil data kompetensi.'
                     });
                 }
             });
 
         }
-
 
 
         $('#formCreate').on('submit', function(e) {
