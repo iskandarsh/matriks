@@ -28,4 +28,13 @@ class MasterKompetensi extends Model
     {
         return $this->belongsTo(MasterKategori::class, 'kategori_id');
     }
+    public function departs()
+    {
+        return $this->belongsToMany(
+            Departement::class,
+            'kompetensi_depart',
+            'kompetensi_id',
+            'depart_id'
+        );
+    }
 }

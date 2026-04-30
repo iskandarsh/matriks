@@ -21,4 +21,13 @@ class Departement extends Model
     {
         return $this->hasMany(Employee::class, 'department_id');
     }
+    public function kompetensis()
+    {
+        return $this->belongsToMany(
+            MasterKompetensi::class,
+            'kompetensi_depart',
+            'depart_id',
+            'kompetensi_id'
+        );
+    }
 }

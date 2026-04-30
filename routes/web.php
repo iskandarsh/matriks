@@ -4,6 +4,7 @@ use App\Http\Controllers\AksesUserController;
 use App\Http\Controllers\CreateUserController;
 use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\EmployeeSettingController;
+use App\Http\Controllers\KompetensiDepartController;
 use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MasterKategoriController;
@@ -12,6 +13,9 @@ use App\Http\Controllers\MasterKompetensiJabatanController;
 use App\Http\Controllers\MasterKompetensiPelatihanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SSOLoginController;
+use App\Models\Departement;
+use App\Models\MasterKompetensi;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -98,5 +102,33 @@ Route::get('/api/cuti/all-dept', [AksesUserController::class, 'getAllDeptCuti'])
 Route::get('/tes123', function () {
     return 'OK';
 });
+
+
+Route::resource('ikompetensi_depart', KompetensiDepartController::class)->middleware(['auth', 'verified', 'web', 'user.permissions:ikompetensi_depart.index']);
+Route::get('/kompetensi-select', function (Request $request) {
+
+    $search = $request->search;
+
+    return MasterKompetensi::when($search, function ($q) use ($search) {
+        $q->where('nama', 'like', "%{$search}%");
+    })
+        ->limit(10)
+        ->get(['id', 'nama']);
+})->name('kompetensi.select');
+
+
+// 🔥 SELECT DEPART
+Route::get('/depart-select', function (Request $request) {
+
+    $search = $request->search;
+
+    return Departement::when($search, function ($q) use ($search) {
+        $q->where('depNama', 'like', "%{$search}%");
+    })
+        ->limit(10)
+        ->get(['id', 'depNama']);
+})->name('depart.select');
+Route::get('kompetensi-depart/data', [KompetensiDepartController::class, 'data'])
+    ->name('kompetensi_depart.data');
 
 require __DIR__ . '/auth.php';
