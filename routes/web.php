@@ -131,4 +131,5 @@ Route::get('/depart-select', function (Request $request) {
 Route::get('kompetensi-depart/data', [KompetensiDepartController::class, 'data'])
     ->name('kompetensi_depart.data');
 
+Route::get('/ajax/kompetensi', [MasterKompetensiController::class, 'kompetensi']);
 require __DIR__ . '/auth.php';

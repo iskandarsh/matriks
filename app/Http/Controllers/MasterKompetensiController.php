@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetailKompetensi;
+use App\Models\MasterKategori;
 use App\Models\MasterKompetensi;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -36,6 +37,26 @@ class MasterKompetensiController extends Controller
     {
         // $this->authorize('view', [TaxStatuses::class, $this->activeMenuId]);
         return view('master.kompetensi');
+    }
+
+    public function kompetensi(Request $request)
+    {
+        $user = auth()->user();
+
+        // ambil semua depart user login
+        $departIds = $user->departments->pluck('id');
+
+        $data = MasterKompetensi::with('details')
+            ->where('kategori_id', $request->kategori_id)
+
+            // 🔥 filter sesuai depart user
+            ->whereHas('departs', function ($q) use ($departIds) {
+                $q->whereIn('depart_id', $departIds);
+            })
+
+            ->get();
+
+        return response()->json($data);
     }
 
     /**
