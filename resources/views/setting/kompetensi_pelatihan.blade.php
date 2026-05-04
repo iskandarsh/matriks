@@ -288,7 +288,7 @@
                             let shortDesc = desc.length > 40 ? desc.substring(0, 40) + '...' : desc;
 
                             options += `
-                            <option value="${d.id}" title="${desc}">
+                            <option value="${d.skala}" title="${desc}">
                                 ${d.skala} - ${shortDesc}
                             </option>
                             `;
@@ -310,7 +310,7 @@
                                             Pilih Nilai
                                         </label>
 
-                                        <select name="detail_kompetensi_id[]" required
+                                        <select name="detail_kompetensi_id[]" 
                                             class="w-full border rounded-lg p-2.5 text-sm sm:text-base
                                                 focus:ring-2 focus:ring-blue-500 focus:outline-none
                                                 bg-white min-h-[42px]">
@@ -522,7 +522,6 @@
                                 allowGrouping: false,
                                 allowHiding: false,
                                 cellTemplate(container, options) {
-
                                     if (options.rowType !== "data") return;
 
                                     const visibleRows = options.component.getVisibleRows();
@@ -539,24 +538,31 @@
                                     }
                                 }
                             },
+
+                            // ✅ GROUP 1
                             {
                                 caption: 'Kategori',
                                 dataField: 'kategori.nama',
                                 calculateCellValue: row => row.kategori?.nama ?? '-',
                                 groupIndex: 0
                             },
+
+                            // ✅ GROUP 2 (GANTI DARI KOMPETENSI → DEPARTEMENT)
+                            {
+                                caption: 'Departement',
+                                dataField: 'departement.depNama',
+                                calculateCellValue: row => row.departement?.depNama ?? '-',
+                                groupIndex: 1
+                            },
+
+                            // ❌ HAPUS GROUP KOMPETENSI (jadi normal column aja)
                             {
                                 caption: 'Kompetensi',
                                 dataField: 'kompetensi.nama',
-                                calculateCellValue: row => row.kompetensi?.nama ?? '-',
-                                groupIndex: 1
+                                calculateCellValue: row => row.kompetensi?.nama ?? '-'
                             },
+
                             {
-                                caption: 'Departement',
-                                dataField: 'departement.depNama', // Simplifies mapping
-                                calculateCellValue: row => row.departement?.depNama ?? '-',
-                                // groupIndex: 0 // Uncomment to group by default
-                            }, {
                                 caption: 'Jabatan',
                                 dataField: 'peran.nama',
                                 calculateCellValue: row => row.posisi?.posiNama ?? '-'
@@ -571,47 +577,42 @@
                                 dataField: 'workunit.nama',
                                 calculateCellValue: row => row.workunit?.woruNama ?? '-'
                             },
+
+                            // ❌ HAPUS INI
+                            // {
+                            //     caption: 'Materi',
+                            //     dataField: 'materi.title',
+                            // },
+
+                            // ✅ TAMBAH NILAI
                             {
-                                caption: 'Materi',
-                                dataField: 'materi.title',
-                                calculateCellValue: row => row.materi?.title ?? '-'
+                                caption: 'Nilai',
+                                dataField: 'nilai',
+                                alignment: 'center',
+                                width: 100
                             },
+
                             {
                                 caption: 'Actions',
                                 alignment: 'center',
                                 width: 120,
                                 allowGrouping: false,
-                                allowSearch: false, // Prevents searching HTML buttons
+                                allowSearch: false,
                                 cellTemplate(container, options) {
                                     const id = options.data.id;
                                     const $wrapper = $('<div>').addClass("flex gap-2 justify-center");
 
-                                    // if (userPermissions.edit) {
-                                    //     $('<button>')
-                                    //         .addClass('p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition')
-                                    //         .html('<i class="fas fa-edit"></i>')
-                                    //         .on('click', (e) => {
-                                    //             e.stopPropagation(); // Prevents row selection
-                                    //             openEditModal(id);
-                                    //         })
-                                    //         .appendTo($wrapper);
-                                    // }
-
                                     if (userPermissions.delete) {
-
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded hover:bg-red-700 transition')
                                             .attr('title', 'Delete')
                                             .html('<i class="fas fa-trash"></i>')
                                             .on('click', e => {
-
                                                 e.stopPropagation();
-
 
                                                 const $btn = $(e.currentTarget);
                                                 const oldHtml = $btn.html();
 
-                                                // loading state
                                                 $btn.prop('disabled', true)
                                                     .html('<i class="fas fa-spinner fa-spin"></i>');
 
@@ -619,11 +620,9 @@
                                                     .finally(() => {
                                                         $btn.prop('disabled', false).html(oldHtml);
                                                     });
-
                                             })
                                             .appendTo($wrapper);
                                     }
-
 
                                     $wrapper.appendTo(container);
                                 }
@@ -737,14 +736,14 @@
                 }
             });
 
-            if (!isValid) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Lengkapi data',
-                    text: 'Semua nilai kompetensi wajib dipilih.'
-                });
-                return;
-            }
+            // if (!isValid) {
+            //     Swal.fire({
+            //         icon: 'warning',
+            //         title: 'Lengkapi data',
+            //         text: 'Semua nilai kompetensi wajib dipilih.'
+            //     });
+            //     return;
+            // }
 
             Swal.fire({
                 title: 'Simpan data?',

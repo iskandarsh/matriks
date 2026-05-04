@@ -333,11 +333,11 @@ class MasterKompetensiPelatihanController extends Controller
             'id_posisi' => 'nullable|integer',
             'id_workunit' => 'nullable|integer',
 
-            'kompetensi_id' => 'required|array|min:1',
-            'kompetensi_id.*' => 'required|integer',
+            'kompetensi_id' => 'nullable|array|min:1',
+            'kompetensi_id.*' => 'nullable|integer',
 
-            'detail_kompetensi_id' => 'required|array|min:1',
-            'detail_kompetensi_id.*' => 'required|integer',
+            'detail_kompetensi_id' => 'nullable|array|min:1',
+            'detail_kompetensi_id.*' => 'nullable|integer',
         ]);
 
         $empToken = Auth::user()->empToken;
@@ -348,6 +348,8 @@ class MasterKompetensiPelatihanController extends Controller
                 'message' => 'Employee tidak ditemukan'
             ], 422);
         }
+
+
 
         DB::beginTransaction();
 
@@ -362,20 +364,28 @@ class MasterKompetensiPelatihanController extends Controller
                 $data = [
                     'id_kategori'    => $validated['id_kategori'],
                     'id_kompetensi'  => $kompetensiId,
-                    'id_detail_kompetensi' => $detailId, // ganti kalau nama kolommu beda
-                    'id_jabatan'     => $validated['id_jabatan'] ?? null,
-                    'id_posisi'      => $validated['id_posisi'] ?? null,
+                    'nilai' => $detailId, // ganti kalau nama kolommu beda
+                    'id_posisi'     => $validated['id_jabatan'] ?? null,
+                    'id_peran'      => $validated['id_posisi'] ?? null,
                     'id_workunit'    => $validated['id_workunit'] ?? null,
                     'user_id'        => Auth::id(),
                     'id_departement' => $employee->department_id ?? null,
                 ];
 
-                $exists = MasterKompetensiPelatihan::where($data)->exists();
-                if ($exists) {
-                    continue;
-                }
-
-                MasterKompetensiPelatihan::create($data);
+                MasterKompetensiPelatihan::updateOrCreate(
+                    [
+                        'id_kategori'    => $validated['id_kategori'],
+                        'id_kompetensi'  => $kompetensiId,
+                        'id_posisi'      => $validated['id_jabatan'] ?? null,
+                        'id_peran'       => $validated['id_posisi'] ?? null,
+                        'id_workunit'    => $validated['id_workunit'] ?? null,
+                        'user_id'        => Auth::id(),
+                        'id_departement' => $employee->department_id ?? null,
+                    ],
+                    [
+                        'nilai' => $detailId
+                    ]
+                );
             }
 
             DB::commit();
