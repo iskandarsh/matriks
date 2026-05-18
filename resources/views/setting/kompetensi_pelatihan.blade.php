@@ -26,6 +26,29 @@
                                 <i class="fas fa-plus"></i> Create
                             </button>
                             @endcan
+                            {{-- BUTTON IMPORT --}}
+                            @can('create', [App\Models\MasterKompetensi::class, session('active_menu_id')])
+                            <form action="{{ route('master-kompetensi.import') }}"
+                                method="POST"
+                                enctype="multipart/form-data"
+                                class="flex items-center gap-2">
+
+                                @csrf
+
+                                <input type="file"
+                                    name="file"
+                                    id="fileImport"
+                                    accept=".xlsx,.xls,.csv"
+                                    class="hidden"
+                                    onchange="this.form.submit()">
+
+                                <button type="button"
+                                    onclick="document.getElementById('fileImport').click()"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
+                                    <i class="fas fa-file-excel"></i> Import Excel
+                                </button>
+                            </form>
+                            @endcan
                         </div>
 
                         <!-- Hanya satu container grid dengan id tetap -->

@@ -16,6 +16,8 @@
                             <i class="fas fa-link"></i> Mapping
                         </button>
                         @endcan
+
+
                     </div>
 
                     <div id="grid"></div>
@@ -279,76 +281,217 @@
             fetch("{{ route('kompetensi_depart.data') }}")
                 .then(res => res.json())
                 .then(data => {
-                    const kompetensis = data.kompetensi || [];
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | FLATTEN DATA PER DEPARTMENT
+                    |--------------------------------------------------------------------------
+                    */
+                    const kompetensis = [];
+
+                    (data.kompetensi || []).forEach(item => {
+
+                        // jika tidak ada depart
+                        if (!item.departs || !item.departs.length) {
+
+                            kompetensis.push({
+                                ...item,
+                                depart_group: '-'
+                            });
+
+                            return;
+                        }
+
+                        // pecah per depart
+                        item.departs.forEach(dep => {
+
+                            kompetensis.push({
+                                ...item,
+                                depart_group: dep.depNama
+                            });
+
+                        });
+
+                    });
+
                     const userPermissions = data.permissions || {};
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DESTROY OLD GRID
+                    |--------------------------------------------------------------------------
+                    */
                     if (gridInstance) {
                         $container.dxDataGrid('dispose');
                         $container.empty();
                     }
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | INIT GRID
+                    |--------------------------------------------------------------------------
+                    */
                     gridInstance = $container.dxDataGrid({
+
                         dataSource: kompetensis,
-                        keyExpr: 'id',
+
+                        // unique key karena data sudah di flatten
+                        keyExpr: function(row) {
+                            return row.id + '_' + row.depart_group;
+                        },
+
                         rowAlternationEnabled: true,
                         columnAutoWidth: true,
                         columnHidingEnabled: true,
                         wordWrapEnabled: true,
+
+                        allowColumnReordering: true,
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | GROUP
+                        |--------------------------------------------------------------------------
+                        */
+                        groupPanel: {
+                            visible: true,
+                            emptyPanelText: 'Drag kolom ke sini untuk grouping'
+                        },
+
+                        grouping: {
+                            autoExpandAll: true,
+                            contextMenuEnabled: true
+                        },
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | SEARCH
+                        |--------------------------------------------------------------------------
+                        */
                         searchPanel: {
                             visible: true,
                             width: 240
                         },
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | PAGING
+                        |--------------------------------------------------------------------------
+                        */
                         paging: {
                             pageSize: 10
                         },
+
                         pager: {
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
                             showInfo: true
                         },
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | STYLE
+                        |--------------------------------------------------------------------------
+                        */
                         onCellPrepared(e) {
+
                             if (e.rowType === "header") {
-                                $(e.cellElement).addClass("bg-gray-100 text-gray-800");
+                                $(e.cellElement)
+                                    .addClass("bg-gray-100 text-gray-800");
                             }
 
                             if (e.rowType === "data") {
-                                $(e.cellElement).addClass("bg-white text-gray-900");
+                                $(e.cellElement)
+                                    .addClass("bg-white text-gray-900");
                             }
                         },
-                        columns: [{
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | COLUMNS
+                        |--------------------------------------------------------------------------
+                        */
+                        columns: [
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | NO
+                            |--------------------------------------------------------------------------
+                            */
+                            {
                                 caption: 'No',
                                 width: 60,
                                 alignment: 'center',
+
                                 cellTemplate(container, options) {
-                                    const pageIndex = gridInstance.pageIndex();
-                                    const pageSize = gridInstance.pageSize();
-                                    const index = options.rowIndex + 1 + (pageIndex * pageSize);
-                                    container.text(index);
+
+                                    const visibleRows = gridInstance.getVisibleRows();
+
+                                    const visibleIndex = visibleRows.findIndex(
+                                        row => row.key === options.key
+                                    );
+
+                                    container.text(visibleIndex + 1);
                                 }
                             },
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | KOMPETENSI
+                            |--------------------------------------------------------------------------
+                            */
                             {
                                 dataField: 'nama',
                                 caption: 'Kompetensi',
                                 alignment: 'left'
                             },
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | KATEGORI
+                            |--------------------------------------------------------------------------
+                            */
                             {
                                 dataField: 'kategori.nama',
                                 caption: 'Kategori',
                                 alignment: 'center',
                                 width: 180,
+
                                 cellTemplate(container, options) {
-                                    const kategori = options.data.kategori?.nama ?? '-';
+
+                                    const kategori =
+                                        options.data.kategori?.nama ?? '-';
 
                                     $('<span>')
-                                        .addClass('inline-block rounded-full px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700')
+                                        .addClass(
+                                            'inline-block rounded-full px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700'
+                                        )
                                         .text(kategori)
                                         .appendTo(container);
                                 }
                             },
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | DEPART
+                            |--------------------------------------------------------------------------
+                            */
                             {
+                                dataField: 'depart_group',
                                 caption: 'Depart',
-                                alignment: 'left',
+
+                                calculateCellValue(rowData) {
+
+                                    if (rowData.depart_group) {
+                                        return rowData.depart_group;
+                                    }
+
+                                    return (rowData.departs || [])
+                                        .map(d => d.depNama)
+                                        .join(', ');
+                                },
+
                                 cellTemplate(container, options) {
+
                                     const departs = options.data.departs || [];
 
                                     if (!departs.length) {
@@ -356,41 +499,84 @@
                                         return;
                                     }
 
-                                    departs.forEach(function(dep) {
+                                    departs.forEach(dep => {
+
                                         $('<span>')
                                             .addClass('inline-block rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 mr-1 mb-1')
                                             .text(dep.depNama)
                                             .appendTo(container);
+
                                     });
                                 }
                             },
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | ACTIONS
+                            |--------------------------------------------------------------------------
+                            */
                             {
                                 caption: 'Actions',
                                 alignment: 'center',
                                 width: 130,
-                                cellTemplate(container, options) {
-                                    container.addClass("text-center align-middle");
 
-                                    const wrapper = $('<div>').addClass('inline-block');
+                                cellTemplate(container, options) {
+
+                                    container.addClass(
+                                        "text-center align-middle"
+                                    );
+
+                                    const wrapper = $('<div>')
+                                        .addClass('inline-block');
+
                                     const id = options.data.id;
 
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | EDIT
+                                    |--------------------------------------------------------------------------
+                                    */
                                     if (userPermissions.edit) {
+
                                         $('<button>')
-                                            .addClass('p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded me-2 transition duration-200')
-                                            .html('<i class="fas fa-edit"></i>')
-                                            .attr('title', 'Edit Mapping')
+                                            .addClass(
+                                                'p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded me-2 transition duration-200'
+                                            )
+                                            .html(
+                                                '<i class="fas fa-edit"></i>'
+                                            )
+                                            .attr(
+                                                'title',
+                                                'Edit Mapping'
+                                            )
                                             .on('click', function() {
+
                                                 openMappingModal(id);
+
                                             })
                                             .appendTo(wrapper);
                                     }
 
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | DELETE
+                                    |--------------------------------------------------------------------------
+                                    */
                                     if (userPermissions.delete) {
+
                                         $('<button>')
-                                            .addClass('p-2 bg-red-600 hover:bg-red-700 text-white rounded transition duration-200')
-                                            .html('<i class="fas fa-trash"></i>')
-                                            .attr('title', 'Hapus Mapping')
+                                            .addClass(
+                                                'p-2 bg-red-600 hover:bg-red-700 text-white rounded transition duration-200'
+                                            )
+                                            .html(
+                                                '<i class="fas fa-trash"></i>'
+                                            )
+                                            .attr(
+                                                'title',
+                                                'Hapus Mapping'
+                                            )
                                             .on('click', function() {
+
                                                 Swal.fire({
                                                     title: 'Hapus mapping?',
                                                     text: 'Semua relasi depart pada kompetensi ini akan dihapus.',
@@ -400,20 +586,48 @@
                                                     cancelButtonText: 'Batal',
                                                     confirmButtonColor: '#dc2626'
                                                 }).then(result => {
+
                                                     if (result.isConfirmed) {
+
                                                         $.ajax({
-                                                            url: "{{ route('ikompetensi_depart.destroy', ':id') }}".replace(':id', id),
+                                                            url: "{{ route('ikompetensi_depart.destroy', ':id') }}"
+                                                                .replace(
+                                                                    ':id',
+                                                                    id
+                                                                ),
+
                                                             type: "POST",
+
                                                             data: {
-                                                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                                                _token: $(
+                                                                    'meta[name="csrf-token"]'
+                                                                ).attr(
+                                                                    'content'
+                                                                ),
+
                                                                 _method: 'DELETE'
                                                             },
-                                                            success: function(res) {
-                                                                Swal.fire('Berhasil', res.message, 'success');
+
+                                                            success: function(
+                                                                res
+                                                            ) {
+
+                                                                Swal.fire(
+                                                                    'Berhasil',
+                                                                    res.message,
+                                                                    'success'
+                                                                );
+
                                                                 loadTable();
                                                             },
+
                                                             error: function() {
-                                                                Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data.', 'error');
+
+                                                                Swal.fire(
+                                                                    'Gagal',
+                                                                    'Terjadi kesalahan saat menghapus data.',
+                                                                    'error'
+                                                                );
                                                             }
                                                         });
                                                     }
@@ -426,7 +640,9 @@
                                 }
                             }
                         ]
+
                     }).dxDataGrid('instance');
+
                 })
                 .catch(err => console.error(err));
         }

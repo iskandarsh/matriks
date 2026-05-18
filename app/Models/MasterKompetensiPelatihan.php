@@ -13,7 +13,6 @@ class MasterKompetensiPelatihan extends Model
 
     protected $fillable = [
         'id_kompetensi',
-        'id_materi',
         'id_kategori',   // ✅ tambah ini
         'user_id',
         'id_departement',
@@ -41,10 +40,6 @@ class MasterKompetensiPelatihan extends Model
         return $this->belongsTo(MasterKompetensi::class, 'id_kompetensi');
     }
 
-    public function materi()
-    {
-        return $this->belongsTo(TrainingMaterials::class, 'id_materi');
-    }
 
     // ✅ RELASI BARU KATEGORI
     public function kategori()
