@@ -481,7 +481,6 @@ class MasterKompetensiPelatihanController extends Controller
 
         $data = MasterKompetensiPelatihan::with([
             'kompetensi',
-            'materi',
             'departement',
             'kategori',
             'posisi',
