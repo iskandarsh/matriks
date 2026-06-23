@@ -49,7 +49,7 @@
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/flatpickr.min.css">
 
-
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script> -->
 </head>
 
 <style>
@@ -78,63 +78,62 @@
         $menuDisabled = $mustChangePassword;
         @endphp
 
+
         <aside
-            x-data="{ collapsed: false }"
-            :class="collapsed ? 'w-10 px-0' : 'w-80 px-4'"
-            class="bg-yellow-200 dark:bg-gray-800 shadow-md py-6 fixed z-40 min-h-screen transition-all duration-300 ease-in-out overflow-hidden flex flex-col justify-start relative">
+            x-data="{ collapsed: window.innerWidth < 768 }"
 
-
-            <!-- Logo + Collapse Button -->
-            <div class="flex items-center justify-between" x-show="!collapsed">
-                <a href="{{ route('dashboard') }}" class="transition-all duration-300">
-                    <img src="{{ env('APP_URL') }}/images/Logo-Interbat.png" alt="Logo" class="h-20 w-auto">
-
+            :class="collapsed ? 'w-20 px-2' : 'w-80 px-4'"
+            class="fixed z-40 min-h-screen bg-white dark:bg-gray-900/60 backdrop-blur-lg border-r border-white/20 dark:border-gray-800/40 shadow-[4px_0_30px_rgba(0,0,0,0.02)] py-6 transition-all duration-300 ease-in-out overflow-visible flex flex-col justify-start relative">
+            <!-- Header Logo + Collapse Button -->
+            <div class="flex items-center mb-5" :class="collapsed ? 'justify-center px-0' : 'justify-between px-2'">
+                <!-- Logo Text / Image -->
+                <a href="{{ route('dashboard') }}" class="transition-all duration-300 transform hover:scale-[1.02]">
+                    <!-- Logo Full (Terbuka) -->
+                    <img x-show="!collapsed" src="{{ env('APP_URL') }}/images/Logo-Interbat.png" alt="Logo" class="h-16 w-auto mix-blend-multiply dark:mix-blend-normal object-contain" x-transition:enter="transition ease-out duration-200">
+                    <!-- Logo Mini (Tertutup) -->
+                    <div x-show="collapsed" class="h-10 w-10 flex items-center justify-center bg-blue-600 rounded-xl text-white font-bold text-lg shadow-md" x-transition:enter="transition ease-out duration-200 delay-100">
+                        IN
+                    </div>
                 </a>
 
-                <!-- Tombol collapse sidebar -->
-                <button @click="collapsed = true"
-                    class="p-2 rounded-lg border border-gray-300 dark:border-gray-600
-                        bg-gray-200 dark:bg-gray-700
-                        hover:bg-gray-300 dark:hover:bg-gray-600
-                        transition-all duration-300 shadow-sm">
-                    <svg class="w-4 h-4 text-gray-700 dark:text-gray-200 transition-transform"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 19l-7-7 7-7" />
+                <!-- Tombol untuk menutup sidebar (Kiri) -->
+                <button x-show="!collapsed" @click="collapsed = true"
+                    class="p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 text-gray-500 hover:text-gray-800 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-all duration-250">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-
             </div>
-            <div class="flex-1 overflow-auto">
+
+            <!-- Main Container Content (Menu & Search) -->
+            <div class="flex-1 overflow-y-auto overflow-x-hidden pr-1 space-y-6 custom-scrollbar">
 
                 <!-- App Name -->
-                <div x-show="!collapsed" class="mb-5 select-none">
-
-                    <!-- Wrapper -->
+                <div x-show="!collapsed" class="mb-5 px-2 select-none" x-transition:enter="transition ease-out duration-200">
                     <div class="space-y-1">
-                        <h2 class="text-[16px] font-semibold tracking-tight 
-        text-gray-900/90 dark:text-white/90">
-                            Matriks Competency
+                        <h2 class="text-base font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                            Training Interbat
                         </h2>
-
-                        <p class="text-[11px] leading-snug 
-        text-gray-500/80 dark:text-gray-400/70">
-                            Development & Trainig Management System
+                        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                            Development & Training Management System
                         </p>
                     </div>
-
-                    <!-- Modern Divider -->
-                    <div class="mt-4 h-px 
-        bg-gradient-to-r from-gray-300/60 via-gray-300/20 to-transparent
-        dark:from-gray-600/40 dark:via-gray-600/20 dark:to-transparent">
-                    </div>
+                    <div class="mt-4 h-px bg-gradient-to-r from-gray-200 via-gray-200/30 to-transparent dark:from-gray-700 dark:via-gray-700/30 dark:to-transparent"></div>
                 </div>
 
-
                 <!-- Search Box -->
-                <input x-show="!collapsed" type="text" id="menuSearch" placeholder="Cari menu..."
-                    class="w-full px-3 py-2 mb-4 border rounded-md text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    {{ $menuDisabled ? 'disabled' : '' }} />
+                <div x-show="!collapsed" class="px-2" x-transition:enter="transition ease-out duration-200">
+                    <div class="relative">
+                        <input type="text" id="menuSearch" placeholder="Cari menu..."
+                            class="w-full pl-9 pr-3 py-2 border rounded-xl text-xs text-gray-800 dark:text-gray-200 bg-white/40 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm"
+                            {{ $menuDisabled ? 'disabled' : '' }} />
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
                 @php
                 function menuClickScript($menuId, $route = null, $menuDisabled = false) {
@@ -163,143 +162,158 @@
                 @endphp
 
                 <!-- Menu Navigation -->
-                <nav x-show="!collapsed" class="space-y-2">
+                <nav :class="collapsed ? 'space-y-3 px-1' : 'space-y-1 px-2'" class="transition-all">
                     @foreach($menus as $menu)
                     @php
-                    $currentRoute = request()->route()?->getName(); // contoh: training-materials.questions
-                    $isActive = false;
-
-                    // --- Aktif berdasarkan session ---
-                    if ($menu->id === session('active_menu_id')) {
-                    $isActive = true;
-                    }
-
-                    // --- Aktif jika child sedang active via session ---
-                    if ($menu->children->contains(fn($child) => $child->id === session('active_menu_id'))) {
-                    $isActive = true;
-                    }
-
-                    // --- Aktif berdasarkan prefix route parent ---
-                    if ($menu->route) {
-                    $prefix = \Illuminate\Support\Str::before($menu->route, '.'); // contoh: training-materials
-                    if ($currentRoute && \Illuminate\Support\Str::startsWith($currentRoute, $prefix . '.')) {
-                    $isActive = true;
-                    }
-                    }
-
-                    // --- Cek child prefix ---
-                    foreach ($menu->children as $child) {
-                    if ($child->route) {
-                    $childPrefix = \Illuminate\Support\Str::before($child->route, '.');
-
-                    if ($currentRoute && \Illuminate\Support\Str::startsWith($currentRoute, $childPrefix . '.')) {
-                    $isActive = true;
-                    break;
-                    }
-                    }
-                    }
+                    $isActive = ($menu->id === session('active_menu_id')) || $menu->children->contains(fn($child) => $child->id === session('active_menu_id'));
                     $hasChildren = $menu->children->isNotEmpty();
-                    $menuClick = $hasChildren ? "open = !open" : menuClickScript($menu->id, $menu->route, $menuDisabled);
+
+                    // Logic Auto-Expand: Jika sidebar tertutup, klik menu akan membuka sidebar sekaligus dropdown
+                    $menuClick = $hasChildren ? "if(collapsed) { collapsed = false; open = true; } else { open = !open; }" : menuClickScript($menu->id, $menu->route, $menuDisabled);
+
                     $menuHref = $menu->route ? route($menu->route) : '#';
 
-                    // === HITUNG TOTAL BADGE PARENT ===
-                    $totalChildBadge = 0;
+                    $totalChildBadge = $menu->children->sum(function ($child) use ($badgeCountsmenu) {
+                    return
+                    ($child->id == 50 ? ($badgeCountsmenu['employeeBaru'] ?? 0) : 0) +
+                    ($child->route === 'applicant' ? ($badgeCountsmenu['applicantBaru'] ?? 0) : 0) +
+                    ($child->route === 'rekap_recruitment' ? ($badgeCountsmenu['rekap_recruitment'] ?? 0) : 0) +
+                    ($child->route === 'recruitment_request' ? ($badgeCountsmenu['recruitment_request'] ?? 0) : 0) +
+                    ($child->id == 43 ? ($badgeCountsmenu['cutiIzinPending'] ?? 0) : 0) +
+                    ($child->id == 44 ? ($badgeCountsmenu['lemburPending'] ?? 0) : 0);
+                    });
 
-                    $parentBadge = 0;
+                    $parentBadge =
+                    ($menu->route === 'applicant' ? ($badgeCountsmenu['applicantBaru'] ?? 0) : 0) +
+                    ($menu->route === 'rekap_recruitment' ? ($badgeCountsmenu['rekap_recruitment'] ?? 0) : 0) +
+                    ($menu->route === 'recruitment_request' ? ($badgeCountsmenu['recruitment_request'] ?? 0) : 0);
 
-                    // === TOTAL BADGE FINAL ===
                     $totalBadge = $totalChildBadge + $parentBadge;
+                    $menuInitial = strtoupper(substr(__($menu->name), 0, 1));
                     @endphp
 
                     <div class="menu-wrapper" x-data="{ open: @json($isActive) }">
 
+                        <!-- Parent Nav Link -->
                         <x-nav-link href="{{ $menuHref }}"
                             @click.prevent="{{ $menuClick }}"
                             :active="$isActive"
-                            class="flex items-center justify-between text-gray-800 dark:text-white hover:bg-blue-200 dark:hover:bg-gray-600 {{ $menuDisabled ? 'menu-disabled' : '' }}">
+                            title="{{ __($menu->name) }}"
+                            :class="collapsed ? 'justify-center p-2' : 'justify-between px-3 py-2.5'"
+                            class="parent-menu flex items-center rounded-xl text-xs font-medium tracking-wide transition-all duration-200 group relative
+                    {{ $isActive 
+                        ? 'bg-blue-600 text-blue-600 dark:bg-blue-500 dark:text-blue-400 font-semibold' 
+                        : 'text-gray-800 dark:text-white hover:bg-blue-200/50 dark:hover:bg-gray-700/60' }} 
+                    {{ $menuDisabled ? 'opacity-50 pointer-events-none' : '' }}">
 
-                            <span>{{ __($menu->name) }}</span>
+                            <!-- Style saat Terbuka -->
+                            <div x-show="!collapsed" class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 rounded-full transition-colors {{ $isActive ? 'bg-blue-500' : 'bg-gray-400 dark:bg-gray-500 group-hover:bg-gray-600' }}"></span>
+                                <span class="truncate text-sm">{{ __($menu->name) }}</span>
+                            </div>
 
-                            <div class="flex items-center gap-2">
-                                {{-- Badge Parent --}}
+                            <!-- Style Modern Saat Tertutup (Menampilkan Inisial Huruf) -->
+                            <div x-show="collapsed" class="flex items-center justify-center w-8 h-8 rounded-lg {{ $isActive ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-transparent text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700' }} transition-all">
+                                <span class="font-bold text-[13px]">{{ $menuInitial }}</span>
+                            </div>
+
+                            <!-- Indikator Badge / Arrow saat Terbuka -->
+                            <div x-show="!collapsed" class="flex items-center gap-2">
                                 @if($totalBadge > 0)
-                                <span class="inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                <span class="inline-flex items-center justify-center bg-red-600 text-white text-[10px] font-bold px-1.5 min-w-[18px] h-[18px] rounded-full shadow-sm">
                                     {{ $totalBadge }}
                                 </span>
                                 @endif
 
-                                {{-- Arrow --}}
                                 @if($hasChildren)
-                                <svg :class="{ 'rotate-180': open }"
-                                    class="w-4 h-4 transition-transform duration-200 transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                <svg :class="{ 'rotate-180 text-blue-500': open }"
+                                    class="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-transform duration-200"
+                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
                                 @endif
                             </div>
+
+                            <!-- Ping Dot Badge saat Tertutup -->
+                            <span x-show="collapsed && @json($totalBadge > 0)" class="absolute -top-1 -right-1 flex h-4 w-4">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 text-[9px] text-white font-bold items-center justify-center">{{ $totalBadge }}</span>
+                            </span>
                         </x-nav-link>
 
+                        <!-- Children Container -->
                         @if($hasChildren)
-                        <div x-show="open" x-transition class="space-y-1 ml-4 mt-2">
+                        <div x-show="open && !collapsed" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="pl-4 mt-1 space-y-0.5 border-l-2 border-gray-100 dark:border-gray-800 ml-[15px]">
                             @foreach($menu->children as $child)
                             @php
                             $childClick = menuClickScript($child->id, $child->route, $menuDisabled);
                             $childHref = $child->route ? route($child->route) : '#';
-                            $childActive =
-                            ($child->id === session('active_menu_id'))
-                            ||
-                            (
-                            $child->route
-                            && request()->routeIs(\Illuminate\Support\Str::before($child->route, '.') . '*')
-                            );
+                            $childActive = $child->id === session('active_menu_id');
 
-
-                            $childBadge = 0;
+                            $childBadge =
+                            ($child->id == 0 ? ($badgeCountsmenu['employeeBaru'] ?? 0) : 0) +
+                            ($child->route === 'applicant' ? ($badgeCountsmenu['applicantBaru'] ?? 0) : 0) +
+                            ($child->route === 'rekap_recruitment' ? ($badgeCountsmenu['rekap_recruitment'] ?? 0) : 0) +
+                            ($child->route === 'recruitment_request' ? ($badgeCountsmenu['recruitment_request'] ?? 0) : 0) +
+                            ($child->id == 43 ? ($badgeCountsmenu['cutiIzinPending'] ?? 0) : 0) +
+                            ($child->id == 44 ? ($badgeCountsmenu['lemburPending'] ?? 0) : 0);
                             @endphp
 
                             <x-nav-link href="{{ $childHref }}"
                                 @click.prevent="{{ $childClick }}"
                                 :active="$childActive"
-                                class="flex items-center justify-between text-gray-800 dark:text-white hover:bg-blue-200 dark:hover:bg-gray-600 {{ $menuDisabled ? 'menu-disabled' : '' }}">
+                                class="child-menu flex items-center justify-between px-3 py-2 rounded-lg text-[11.5px] font-medium transition-all duration-150
+                        {{ $childActive 
+                            ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/40 dark:bg-blue-950/20' 
+                            : 'text-gray-800 dark:text-white hover:bg-blue-200 dark:hover:bg-gray-600' }}
+                        {{ $menuDisabled ? 'opacity-50 pointer-events-none' : '' }}">
 
-                                <span>{{ __($child->name) }}</span>
+                                <span class="truncate text-sm">{{ __($child->name) }}</span>
 
                                 @if($childBadge > 0)
-                                <span class="inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                <span class="inline-flex items-center justify-center bg-red-600 text-white text-[9px] font-bold px-1.5 min-w-[16px] h-[16px] rounded-full">
                                     {{ $childBadge }}
                                 </span>
                                 @endif
-
                             </x-nav-link>
                             @endforeach
                         </div>
                         @endif
                     </div>
                     @endforeach
-                </nav>
 
-                <!-- Tombol panah tengah saat collapsed -->
-                <div x-show="collapsed" class="absolute top-1/2 -right-4 transform -translate-y-1/2 w-16 flex justify-center">
-                    <button @click="collapsed = false"
-                        class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 shadow-md">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </div>
+                    <!-- Halaman Utama -->
+
+                </nav>
+            </div>
+
+            <!-- TOMBOL PANAH KANAN (Melayang di luar container scroll) -->
+            <div x-show="collapsed" x-transition.opacity.duration.300ms class="absolute top-1/2 -right-3.5 transform -translate-y-1/2 z-[60]">
+                <button @click="collapsed = false"
+                    class="p-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-blue-600 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:scale-110 transition-all duration-200 flex items-center justify-center group outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
             </div>
         </aside>
 
-
-        <!-- Ghost bar (letakkan tepat setelah main-sidebar) -->
-        <div id="sidebar-ghost" class="sidebar-ghost hidden" role="button" aria-label="Buka sidebar" tabindex="0">
-            <div id="sidebar-ghost-line"></div>
+        <!-- Ghost bar -->
+        <div id="sidebar-ghost" class="sidebar-ghost hidden fixed top-0 left-0 h-screen w-1 bg-transparent hover:bg-blue-500/20 dark:hover:bg-blue-400/10 transition-colors z-30 cursor-pointer" role="button" aria-label="Buka sidebar" tabindex="0">
+            <div id="sidebar-ghost-line" class="h-full w-px bg-gray-200/50 dark:bg-gray-800/40 backdrop-blur-sm"></div>
         </div>
-
         <!-- Content Area -->
-        <div class="w-full  shadow-lg rounded-lg overflow-hidden">
+        <!-- <div class="w-full  shadow-lg rounded-lg overflow-hidden"> -->
+        <div
+            class="flex flex-col min-h-screen flex-1 min-w-0 shadow-lg rounded-lg"
+            :class="collapsed ? 'ml-20' : 'ml-80'">
             <!-- Header -->
-            <header class="bg-yellow-200 dark:bg-gray-800 shadow">
+            <header
+                class="sticky top-0 z-40
+                bg-white dark:bg-slate-900/70
+                backdrop-blur-2xl
+                border-b border-slate-200/50 dark:border-slate-700/50
+                shadow-sm">
                 <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
 
 
@@ -333,90 +347,327 @@
                     $quoteToday = $quotes[0];
                     srand();
                     @endphp
-
-
                     <!-- LEFT: Welcome + Quote -->
-                    <div class="flex items-center space-x-4">
-                        <img src="{{ Auth::user()->employee?->applicant?->appPhoto
-                                ? env('APP_URL') . 'interbat/' . Auth::user()->employee->applicant->appPhoto
-                                : env('APP_URL') . '/images/default-avatar.png'
-                            }}"
-                            alt="Avatar"
-                            class="w-11 h-11 rounded-full object-cover border border-gray-300 dark:border-gray-600 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        @php
+                        $photo = Auth::user()->employee?->applicant?->appPhoto;
+                        $path = public_path('appPhoto/' . $photo);
+                        @endphp
 
-                        <div class="leading-tight">
-                            <p class="text-gray-900 dark:text-white font-semibold">Welcome, {{ Auth::user()->name }} 👋</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $quoteToday }}</p>
-                        </div>
-                    </div>
+                        <div class="relative group">
 
+                            <div
+                                class="
+                                absolute
+                                inset-0
 
-                    <!-- Right Side: User Profile & Dropdown -->
-                    <div class="relative z-50" x-data="{ open: false }">
-                        <!-- Avatar Button -->
-                        <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                            <!-- <img src="{{ Auth::user()->employee?->applicant?->appPhoto 
-                                ? asset('' . Auth::user()->employee->applicant->appPhoto)
-                                : asset('images/default-avatar.png') }}"
-                                alt="Avatar"
-                                class="w-8 h-8 rounded-full object-cover border border-gray-300 dark:border-gray-600 shadow-sm"> -->
-                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
+                                rounded-2xl
 
-                        <!-- Dropdown -->
-                        <div x-show="open" @click.away="open = false"
-                            x-transition:enter="transition ease-out duration-150"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-100"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-3 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+                                bg-gradient-to-br
+                                from-indigo-500/20
+                                via-cyan-500/20
+                                to-purple-500/20
 
-                            <div class="px-4 py-3 border-b dark:border-gray-700">
-                                <p class="text-sm text-gray-600 dark:text-gray-300">Signed in as</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                    {{ Auth::user()->email }}
-                                </p>
+                                blur-xl
+                                scale-110
+
+                                opacity-0
+                                group-hover:opacity-100
+
+                                transition-all
+                                duration-500">
                             </div>
 
-                            <a href="{{ route('profile.edit') }}"
-                                class="block px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                                Ganti Password
-                            </a>
+                            <img
+                                src="{{ Auth::user()->employee?->applicant?->appPhoto
+                                    ? env('APP_URL') . 'interbat/' . Auth::user()->employee->applicant->appPhoto
+                                    : env('APP_URL') . '/images/default-avatar.png'
+                                }}"
+                                alt="Avatar"
+                                class="
+                                relative
 
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit"
-                                    class="block w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-red-50 dark:hover:bg-red-900/30 transition">
-                                    Log Out
-                                </button>
-                            </form>
+                                w-14 h-14
+                                rounded-2xl
+                                object-cover
+
+                                ring-4
+                                ring-white
+                                dark:ring-slate-800
+
+                                shadow-xl">
+
+                            <span
+                                class="
+                                absolute
+                                bottom-0
+                                right-0
+
+                                w-4 h-4
+                                rounded-full
+
+                                bg-emerald-500
+                                border-2
+                                border-white
+                                dark:border-slate-900
+                                animate-pulse">
+                            </span>
+
+                        </div>
+
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 class="font-bold text-slate-900 dark:text-white">
+                                    Welcome, {{ Auth::user()->name }} 👋
+                                </h2>
+
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                        bg-emerald-100 text-emerald-700
+                        dark:bg-emerald-500/20 dark:text-emerald-400">
+                                    Online
+                                </span>
+                            </div>
+
+                            <p class="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xl">
+                                {{ $quoteToday }}
+                            </p>
                         </div>
                     </div>
+                    <!-- Right Side: User Profile & Dropdown -->
+                    {{-- RIGHT --}}
+                    <div class="flex items-center gap-4">
 
+                        {{-- Clock --}}
+                        <div class="hidden md:flex flex-col text-right">
+                            <span id="liveClock"
+                                class="font-semibold text-slate-800 dark:text-white">
+                            </span>
+
+                            <span class="text-xs text-slate-500">
+                                Asia/Jakarta
+                            </span>
+                        </div>
+
+                        {{-- Profile Dropdown --}}
+                        <div class="relative z-50" x-data="{ open: false }">
+
+                            <button
+                                @click="open = !open"
+                                class="flex items-center gap-3
+                    px-3 py-2 rounded-2xl
+                    bg-white/50 dark:bg-slate-800/50
+                    backdrop-blur-lg
+                    border border-slate-200 dark:border-slate-700
+                    hover:bg-white dark:hover:bg-slate-800
+                    transition">
+
+
+
+                                <svg
+                                    class="w-4 h-4 text-slate-600 dark:text-slate-300"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+
+                            </button>
+
+                            {{-- Dropdown --}}
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-3 w-72
+                                bg-white/90 dark:bg-slate-800/90
+                                backdrop-blur-xl
+                                rounded-3xl
+                                shadow-2xl
+                                border border-slate-200 dark:border-slate-700
+                                overflow-hidden">
+
+                                <div class="p-5 border-b border-slate-200 dark:border-slate-700">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <img
+                                            src="{{ $photo
+        ? env('APP_URL') . '/interbat/' . $photo
+        : env('APP_URL') . '/images/default-avatar.png'
+    }}"
+                                            alt="Avatar"
+                                            class="w-12 h-12 rounded-xl object-cover" />
+                                        <div>
+                                            <h4 class="font-semibold text-slate-900 dark:text-white">
+                                                {{ Auth::user()->name }}
+                                            </h4>
+
+                                            <p class="text-xs text-slate-500 truncate">
+                                                {{ Auth::user()->email }}
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <a href="{{ route('profile.edit') }}"
+                                    class="flex items-center gap-3 px-5 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                                    🔐
+                                    <span>Ganti Password</span>
+                                </a>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+
+                                    <button type="submit"
+                                        class="w-full text-left flex items-center gap-3 px-5 py-3
+                            hover:bg-red-50 dark:hover:bg-red-900/20
+                            text-red-600 transition">
+                                        🚪
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
 
                 </div>
             </header>
 
 
-
             <!-- Main Content -->
-            <main class="p-2 text-gray-800 dark:text-white">
+            <main class="flex-1  text-gray-800 dark:text-white">
                 {{ $slot }}
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white dark:bg-gray-800 shadow p-2 z-10  text-sm text-gray-600 dark:text-gray-300 fixed bottom-0 w-full">
-                &copy; {{ date('Y') }} PT. Interbat. All rights reserved.
-                <div class="text-xs text-gray-500 dark:text-gray-400">
-                    Version {{ config('app.version', '1.1') }} • Build IT
+            <footer
+                class="
+                 border-slate-200/60 dark:border-slate-700/60
+
+                bg-white
+                dark:bg-slate-900/70
+
+                backdrop-blur-xl
+                ">
+
+                <div class="px-6 py-5">
+
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+
+                        <!-- Left -->
+                        <div class="flex flex-col sm:flex-row items-center gap-2 text-sm">
+
+                            <span class="text-slate-500 dark:text-slate-400">
+                                © {{ date('Y') }}
+                            </span>
+
+                            <span class="font-semibold text-slate-800 dark:text-white">
+                                PT. Interbat
+                            </span>
+
+                            <span class="hidden sm:block text-slate-300">
+                                •
+                            </span>
+
+                            <span class="text-slate-500 dark:text-slate-400">
+                                Human Resource Information System
+                            </span>
+
+                        </div>
+
+                        <!-- Center -->
+                        <div
+                            class="
+                flex items-center gap-2
+                px-3 py-1.5
+
+                rounded-full
+
+                bg-emerald-50
+                dark:bg-emerald-500/10
+
+                border
+                border-emerald-200
+                dark:border-emerald-500/20">
+
+                            <span
+                                class="
+                    w-2 h-2
+                    rounded-full
+                    bg-emerald-500
+                    animate-pulse">
+                            </span>
+
+                            <span
+                                class="
+                    text-xs
+                    font-medium
+                    text-emerald-700
+                    dark:text-emerald-400">
+
+                                System Online
+
+                            </span>
+
+                        </div>
+
+                        <!-- Right -->
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                class="
+                    px-3 py-1.5
+                    rounded-full
+
+                    bg-slate-100
+                    dark:bg-slate-800
+
+                    border
+                    border-slate-200
+                    dark:border-slate-700">
+
+                                <span
+                                    class="
+                        text-xs
+                        font-mono
+                        font-semibold
+                        text-slate-700
+                        dark:text-slate-300">
+
+                                    v{{ config('app.version', '1.3.2') }}
+
+                                </span>
+
+                            </div>
+
+                            <span
+                                class="
+                    text-xs
+                    tracking-[0.2em]
+                    uppercase
+                    text-slate-400">
+
+                                Build IT
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </footer>
         </div>
+
+
     </div>
 
 
@@ -608,19 +859,94 @@
             });
 
             // Menu search
-            $('#menuSearch').on('input', function() {
-                const query = $(this).val().toLowerCase();
-                $(".menu-wrapper").each(function() {
-                    let text = $(this).text().toLowerCase();
-                    $(this).toggle(text.includes(query));
+            $('#menuSearch').on('keyup', function() {
+
+                let keyword = $(this).val().toLowerCase().trim();
+                if (keyword === '') {
+
+                    $('.menu-wrapper').show();
+                    $('.child-menu').show();
+
+                    $('.menu-wrapper').each(function() {
+
+                        const data = Alpine.$data(this);
+
+                        if (data) {
+                            data.open = false;
+                        }
+
+                    });
+
+                    return;
+                }
+                $('.menu-wrapper').each(function() {
+
+                    let wrapper = $(this);
+
+                    let parent = wrapper.find('.parent-menu').first();
+                    let parentText = parent.text().toLowerCase();
+
+                    let parentMatch = parentText.includes(keyword);
+
+                    let childMatch = false;
+
+                    wrapper.find('.child-menu').hide();
+
+                    wrapper.find('.child-menu').each(function() {
+
+                        let child = $(this);
+                        let childText = child.text().toLowerCase();
+
+                        if (childText.includes(keyword)) {
+                            child.show();
+                            childMatch = true;
+                        }
+                    });
+
+                    if (parentMatch) {
+
+                        wrapper.show();
+                        wrapper.find('.child-menu').show();
+
+                    } else if (childMatch) {
+
+                        wrapper.show();
+
+                        wrapper.attr('x-data-open', 'true');
+
+                        const data = Alpine.$data(wrapper[0]);
+
+                        if (data) {
+                            data.open = true;
+                        }
+
+                    } else {
+
+                        wrapper.hide();
+                    }
                 });
+
             });
 
             // Initialize AOS
             AOS.init();
         });
     </script>
+    <script>
+        function updateClock() {
+            const now = new Date();
 
+            document.getElementById('liveClock').innerHTML =
+                now.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 
 </body>
 
