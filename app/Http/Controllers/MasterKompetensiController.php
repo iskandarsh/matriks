@@ -50,22 +50,27 @@ class MasterKompetensiController extends Controller
     {
         $user = auth()->user();
 
-        // ambil semua depart user login
         $departIds = $user->departments->pluck('id');
+
+        $isSuperDepart = $departIds
+            ->intersect([5, 6])
+            ->isNotEmpty();
+
+        if ($isSuperDepart && $request->filled('department_id')) {
+            $filterDepartIds = [$request->department_id];
+        } else {
+            $filterDepartIds = $departIds;
+        }
 
         $data = MasterKompetensi::with('details')
             ->where('kategori_id', $request->kategori_id)
-
-            // 🔥 filter sesuai depart user
-            ->whereHas('departs', function ($q) use ($departIds) {
-                $q->whereIn('depart_id', $departIds);
+            ->whereHas('departs', function ($q) use ($filterDepartIds) {
+                $q->whereIn('depart_id', $filterDepartIds);
             })
-
             ->get();
 
         return response()->json($data);
     }
-
     /**
      * Show the form for creating a new resource.
      */

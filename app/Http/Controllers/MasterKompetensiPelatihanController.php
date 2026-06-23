@@ -332,24 +332,42 @@ class MasterKompetensiPelatihanController extends Controller
             'id_jabatan' => 'nullable|integer',
             'id_posisi' => 'nullable|integer',
             'id_workunit' => 'nullable|integer',
+            'department_id' => 'nullable|integer',
 
-            'kompetensi_id' => 'nullable|array|min:1',
-            'kompetensi_id.*' => 'nullable|integer',
+            'kompetensi_id' => 'required|array|min:1',
+            'kompetensi_id.*' => 'required|integer',
 
-            'detail_kompetensi_id' => 'nullable|array|min:1',
+            'detail_kompetensi_id' => 'required|array|min:1',
             'detail_kompetensi_id.*' => 'nullable|integer',
         ]);
 
-        $empToken = Auth::user()->empToken;
-        $employee = Employee::where('empToken', $empToken)->first();
+        $user = Auth::user();
+
+        $employee = Employee::where('empToken', $user->empToken)->first();
 
         if (!$employee) {
             return response()->json([
-                'message' => 'Employee tidak ditemukan'
+                'message' => 'Employee tidak ditemukan.'
             ], 422);
         }
 
+        // Cek apakah user memiliki departemen 5 atau 6
+        $isSuperDepart = $user->departments
+            ->pluck('id')
+            ->intersect([5, 6])
+            ->isNotEmpty();
 
+        // Tentukan departemen yang akan disimpan
+        $departmentId = $isSuperDepart
+            ? ($validated['department_id'] ?? null)
+            : $employee->department_id;
+
+        // Jika user depart 5/6 maka department wajib dipilih
+        if ($isSuperDepart && empty($departmentId)) {
+            return response()->json([
+                'message' => 'Department wajib dipilih.'
+            ], 422);
+        }
 
         DB::beginTransaction();
 
@@ -357,20 +375,10 @@ class MasterKompetensiPelatihanController extends Controller
             foreach ($validated['kompetensi_id'] as $index => $kompetensiId) {
                 $detailId = $validated['detail_kompetensi_id'][$index] ?? null;
 
-                if (!$detailId) {
+                // Skip jika nilai belum dipilih
+                if (empty($detailId)) {
                     continue;
                 }
-
-                $data = [
-                    'id_kategori'    => $validated['id_kategori'],
-                    'id_kompetensi'  => $kompetensiId,
-                    'nilai' => $detailId, // ganti kalau nama kolommu beda
-                    'id_posisi'     => $validated['id_jabatan'] ?? null,
-                    'id_peran'      => $validated['id_posisi'] ?? null,
-                    'id_workunit'    => $validated['id_workunit'] ?? null,
-                    'user_id'        => Auth::id(),
-                    'id_departement' => $employee->department_id ?? null,
-                ];
 
                 MasterKompetensiPelatihan::updateOrCreate(
                     [
@@ -379,11 +387,11 @@ class MasterKompetensiPelatihanController extends Controller
                         'id_posisi'      => $validated['id_jabatan'] ?? null,
                         'id_peran'       => $validated['id_posisi'] ?? null,
                         'id_workunit'    => $validated['id_workunit'] ?? null,
-                        'user_id'        => Auth::id(),
-                        'id_departement' => $employee->department_id ?? null,
+                        'id_departement' => $departmentId,
+                        'user_id'        => $user->id,
                     ],
                     [
-                        'nilai' => $detailId
+                        'nilai' => $detailId,
                     ]
                 );
             }
@@ -391,18 +399,20 @@ class MasterKompetensiPelatihanController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Data berhasil disimpan'
+                'success' => true,
+                'message' => 'Data kompetensi berhasil disimpan.'
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
 
             return response()->json([
-                'message' => 'Terjadi kesalahan saat menyimpan data'
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
-
 
     /**
      * Display the specified resource.

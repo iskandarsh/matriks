@@ -84,6 +84,13 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
+                        <div id="departmentWrapper" class="hidden">
+                            <label class="text-sm font-medium">Department</label>
+                            <select id="selectDepartment" name="department_id"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
                         <div>
                             <label class="text-sm font-medium">Jabatan</label>
                             <select id="selectJabatan" name="id_jabatan"
@@ -141,8 +148,17 @@
         </div>
     </div>
 
+    @php
+    $isSuperDepart = auth()->user()
+    ->departments
+    ->pluck('id')
+    ->intersect([5, 6])
+    ->isNotEmpty();
+    @endphp
 
-
+    <script>
+        const isSuperDepart = @json($isSuperDepart);
+    </script>
 
     <!-- THEME SCRIPT -->
     <script>
@@ -168,6 +184,35 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            if (isSuperDepart) {
+                $('#departmentWrapper').removeClass('hidden');
+
+                $('#selectDepartment').select2({
+                    dropdownParent: $('#modalCreate'),
+                    width: '100%',
+                    placeholder: '-- Pilih Department --',
+                    allowClear: true,
+                    ajax: {
+                        url: '{{ route("depart.select") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                search: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.depNama
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
 
             $('#btnCreate').on('click', function() {
                 $('#modalCreate').removeClass('hidden').addClass('flex');
@@ -260,6 +305,12 @@
                     }
                 }
             });
+
+            $('#selectDepartment').on('change', function() {
+                loadKompetensi();
+            });
+
+
             $('#selectKategori').on('change', function() {
                 loadKompetensi();
             });
@@ -270,9 +321,17 @@
 
 
         function loadKompetensi() {
+
             let kategoriId = $('#selectKategori').val();
+            let departmentId = $('#selectDepartment').val();
 
             if (!kategoriId) {
+                $('#kompetensiWrapper').addClass('hidden');
+                $('#kompetensiList').html('');
+                return;
+            }
+
+            if (isSuperDepart && !departmentId) {
                 $('#kompetensiWrapper').addClass('hidden');
                 $('#kompetensiList').html('');
                 return;
@@ -286,7 +345,8 @@
                 url: 'ajax/kompetensi',
                 method: 'GET',
                 data: {
-                    kategori_id: kategoriId
+                    kategori_id: kategoriId,
+                    department_id: departmentId
                 },
                 success: function(res) {
 
@@ -304,47 +364,50 @@
 
                     res.forEach(item => {
 
-                        let options = `<option value="">-- Pilih Nilai --</option>`;
+                        let options =
+                            `<option value="">-- Pilih Nilai --</option>`;
 
                         item.details.forEach(d => {
+
                             let desc = d.deskripsi ?? '';
-                            let shortDesc = desc.length > 40 ? desc.substring(0, 40) + '...' : desc;
+                            let shortDesc = desc.length > 40 ?
+                                desc.substring(0, 40) + '...' :
+                                desc;
 
                             options += `
-                            <option value="${d.skala}" title="${desc}">
-                                ${d.skala} - ${shortDesc}
-                            </option>
-                            `;
+                        <option value="${d.skala}" title="${desc}">
+                            ${d.skala} - ${shortDesc}
+                        </option>
+                    `;
                         });
 
                         html += `
-                            <div class="p-3 sm:p-4 rounded-xl border bg-white shadow-sm hover:shadow transition">
+                    <div class="p-3 sm:p-4 rounded-xl border bg-white shadow-sm hover:shadow transition">
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                                    <div>
-                                        <input type="hidden" name="kompetensi_id[]" value="${item.id}">
-                                        <input type="text" value="${item.nama}" readonly
-                                            class="w-full border rounded-lg p-2 bg-gray-50 text-sm sm:text-base">
-                                    </div>
+                            <div>
+                                <input type="hidden"
+                                    name="kompetensi_id[]"
+                                    value="${item.id}">
 
-                                    <div>
-                                        <label class="block text-xs text-gray-500 mb-1 sm:hidden">
-                                            Pilih Nilai
-                                        </label>
-
-                                        <select name="detail_kompetensi_id[]" 
-                                            class="w-full border rounded-lg p-2.5 text-sm sm:text-base
-                                                focus:ring-2 focus:ring-blue-500 focus:outline-none
-                                                bg-white min-h-[42px]">
-                                            ${options}
-                                        </select>
-                                    </div>
-
-                                </div>
-
+                                <input type="text"
+                                    value="${item.nama}"
+                                    readonly
+                                    class="w-full border rounded-lg p-2 bg-gray-50">
                             </div>
-                        `;
+
+                            <div>
+                                <select name="detail_kompetensi_id[]"
+                                    class="w-full border rounded-lg p-2.5">
+                                    ${options}
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
                     });
 
                     $('#kompetensiList').html(html);
