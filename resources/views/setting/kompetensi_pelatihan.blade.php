@@ -148,6 +148,137 @@
         </div>
     </div>
 
+
+    <div id="modalEdit"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-4">
+
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl
+            max-h-[95vh] flex flex-col">
+
+            <!-- HEADER -->
+            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b flex justify-between items-center shrink-0">
+                <h2 class="text-base sm:text-lg font-semibold">
+                    Edit Kompetensi
+                </h2>
+
+                <button type="button"
+                    onclick="$('#modalEdit').addClass('hidden')"
+                    class="text-gray-400 hover:text-red-500 text-lg">
+                    ✕
+                </button>
+            </div>
+
+            <!-- BODY -->
+            <div class="overflow-y-auto px-4 sm:px-6 py-4 space-y-5">
+
+                <form id="formEdit" class="space-y-5">
+                    @csrf
+                    @method('PUT')
+
+                    <input type="hidden" id="edit_id">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        <div id="editDepartmentWrapper" class="hidden">
+                            <label class="text-sm font-medium">
+                                Department
+                            </label>
+
+                            <select id="editDepartment"
+                                name="department_id"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium">
+                                Jabatan
+                            </label>
+
+                            <select id="editJabatan"
+                                name="id_jabatan"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium">
+                                Posisi
+                            </label>
+
+                            <select id="editPosisi"
+                                name="id_posisi"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium">
+                                Work Unit
+                            </label>
+
+                            <select id="editWorkunit"
+                                name="id_workunit"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium">
+                                Kategori
+                            </label>
+
+                            <select id="editKategori"
+                                name="id_kategori"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- KOMPETENSI -->
+                    <div id="editKompetensiWrapper"
+                        class="mt-4 hidden">
+
+                        <label class="font-semibold text-gray-700">
+                            Kompetensi & Penilaian
+                        </label>
+
+                        <div id="editKompetensiLoading"
+                            class="hidden text-sm text-gray-500 mt-2">
+                            Loading kompetensi...
+                        </div>
+
+                        <div id="editKompetensiList"
+                            class="space-y-3 mt-3">
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="px-4 sm:px-6 py-4 border-t flex flex-col sm:flex-row justify-end gap-3 shrink-0 bg-white">
+
+                <button type="button"
+                    onclick="$('#modalEdit').addClass('hidden')"
+                    class="w-full sm:w-auto border px-4 py-2 rounded-lg">
+                    Batal
+                </button>
+
+                <button type="submit"
+                    form="formEdit"
+                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg">
+                    Update
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
     @php
     $isSuperDepart = auth()->user()
     ->departments
@@ -315,10 +446,383 @@
                 loadKompetensi();
             });
 
+            if (isSuperDepart) {
+                $('#editDepartmentWrapper').removeClass('hidden');
 
+                $('#editDepartment').select2({
+                    dropdownParent: $('#modalEdit'),
+                    width: '100%',
+                    placeholder: '-- Pilih Department --',
+                    allowClear: true,
+                    ajax: {
+                        url: '{{ route("depart.select") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                search: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.depNama
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+            $('#editKategori').select2({
+                dropdownParent: $('#modalEdit'),
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Pilih kategori',
+                ajax: {
+                    url: "{{ route('kategori.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
 
+            $('#editJabatan').select2({
+                dropdownParent: $('#modalEdit'),
+                width: '100%',
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih Jabatan',
+                ajax: {
+                    url: 'dropdown/jabatan',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
+
+            $('#editPosisi').select2({
+                dropdownParent: $('#modalEdit'),
+                width: '100%',
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih Posisi',
+                ajax: {
+                    url: 'dropdown/posisi',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
+
+            $('#editWorkunit').select2({
+                dropdownParent: $('#modalEdit'),
+                width: '100%',
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih Workunit',
+                ajax: {
+                    url: 'dropdown/workunit',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
         });
 
+
+        function openEditModal(id) {
+            $('#formEdit')[0].reset();
+            $('#edit_id').val('');
+            $('#editKompetensiList').html('');
+            $('#editKompetensiWrapper').addClass('hidden');
+            editSavedItems = [];
+
+            // reset select2 supaya value lama hilang
+            $('#editKategori').empty().trigger('change');
+            $('#editJabatan').empty().trigger('change');
+            $('#editPosisi').empty().trigger('change');
+            $('#editWorkunit').empty().trigger('change');
+            $('#editDepartment').empty().trigger('change');
+
+            $.ajax({
+                url: `ikompetensi_pelatihan/${id}`,
+                type: 'GET',
+                success: function(res) {
+                    $('#edit_id').val(res.id);
+
+                    // set select kategori
+                    if (res.kategori) {
+                        const optKategori = new Option(res.kategori.nama, res.kategori.id, true, true);
+                        $('#editKategori').append(optKategori).trigger('change');
+                    }
+
+                    // set jabatan
+                    if (res.posisi) {
+                        const optJabatan = new Option(res.posisi.posiNama, res.posisi.id, true, true);
+                        $('#editJabatan').append(optJabatan).trigger('change');
+                    }
+
+                    // set posisi
+                    if (res.peran) {
+                        const optPosisi = new Option(res.peran.name, res.peran.id, true, true);
+                        $('#editPosisi').append(optPosisi).trigger('change');
+                    }
+
+                    // set workunit
+                    if (res.workunit) {
+                        const optWorkunit = new Option(res.workunit.woruNama, res.workunit.id, true, true);
+                        $('#editWorkunit').append(optWorkunit).trigger('change');
+                    }
+
+                    // set department kalau super depart
+                    if (isSuperDepart && res.departement) {
+                        const optDept = new Option(res.departement.depNama, res.departement.id, true, true);
+                        $('#editDepartment').append(optDept).trigger('change');
+                    }
+
+                    editSavedItems = res.items ?? [];
+                    loadKompetensiEdit(
+                        res.id_kategori,
+                        isSuperDepart ? res.department_id : null,
+                        editSavedItems
+                    );
+
+                    $('#modalEdit').removeClass('hidden').addClass('flex');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Data tidak ditemukan'
+                    });
+                }
+            });
+        }
+
+        function loadKompetensiEdit(
+            kategoriId = null,
+            departmentId = null,
+            savedItems = []
+        ) {
+            kategoriId =
+                kategoriId || $('#editKategori').val();
+
+            departmentId =
+                departmentId ||
+                $('#editDepartment').val();
+
+            if (!kategoriId) {
+                $('#editKompetensiWrapper')
+                    .addClass('hidden');
+                $('#editKompetensiList').html('');
+                return;
+            }
+
+            if (isSuperDepart && !departmentId) {
+                $('#editKompetensiWrapper')
+                    .addClass('hidden');
+                $('#editKompetensiList').html('');
+                return;
+            }
+
+            $('#editKompetensiWrapper')
+                .removeClass('hidden');
+
+            $('#editKompetensiLoading')
+                .removeClass('hidden');
+
+            $('#editKompetensiList').html('');
+
+            const savedMap = {};
+
+            savedItems.forEach(item => {
+                savedMap[item.kompetensi_id] =
+                    item.nilai;
+            });
+
+            $.ajax({
+                url: 'ajax/kompetensi',
+                type: 'GET',
+                data: {
+                    kategori_id: kategoriId,
+                    department_id: departmentId
+                },
+                success: function(res) {
+                    $('#editKompetensiLoading')
+                        .addClass('hidden');
+
+                    let html = '';
+
+                    if (!res.length) {
+                        html = `
+                    <div class="text-sm text-gray-500 italic">
+                        Tidak ada kompetensi pada kategori ini
+                    </div>
+                `;
+                    }
+
+                    res.forEach(item => {
+
+                        let options =
+                            `<option value="">-- Pilih Nilai --</option>`;
+
+                        item.details.forEach(d => {
+
+                            const selected =
+                                String(savedMap[item.id] ?? '') ===
+                                String(d.skala) ?
+                                'selected' :
+                                '';
+
+                            const desc =
+                                d.deskripsi ?? '';
+
+                            const shortDesc =
+                                desc.length > 40 ?
+                                desc.substring(0, 40) + '...' :
+                                desc;
+
+                            options += `
+                        <option
+                            value="${d.skala}"
+                            title="${desc}"
+                            ${selected}>
+                            ${d.skala} - ${shortDesc}
+                        </option>
+                    `;
+                        });
+
+                        html += `
+                    <div class="p-3 sm:p-4 rounded-xl border bg-white shadow-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <div>
+                                <input
+                                    type="hidden"
+                                    name="kompetensi_id[]"
+                                    value="${item.id}">
+
+                                <input
+                                    type="text"
+                                    value="${item.nama}"
+                                    readonly
+                                    class="w-full border rounded-lg p-2 bg-gray-50">
+                            </div>
+
+                            <div>
+                                <select
+                                    name="detail_kompetensi_id[]"
+                                    class="w-full border rounded-lg p-2.5">
+                                    ${options}
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+                    });
+
+                    $('#editKompetensiList').html(html);
+                },
+                error: function() {
+                    $('#editKompetensiLoading')
+                        .addClass('hidden');
+
+                    $('#editKompetensiList').html(`
+                <div class="text-red-500 text-sm">
+                    Gagal mengambil data kompetensi
+                </div>
+            `);
+                }
+            });
+        }
+
+
+        $('#formEdit').on('submit', function(e) {
+            e.preventDefault();
+
+            const form = this;
+            const submitBtn = $('[form="formEdit"]');
+
+            Swal.fire({
+                title: 'Update data?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, update',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: 'Menyimpan...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.ajax({
+                    url: `ikompetensi_pelatihan/${$('#edit_id').val()}`,
+                    type: 'POST',
+                    data: $(form).serialize(),
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Menyimpan...');
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message ?? 'Data berhasil diupdate',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        $('#modalEdit').addClass('hidden').removeClass('flex');
+                        $('#formEdit')[0].reset();
+                        $('#editKompetensiList').html('');
+                        $('#editKompetensiWrapper').addClass('hidden');
+                        loadTable();
+                    },
+                    error: function(xhr) {
+                        let msg = 'Gagal update data';
+
+                        if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+
+                        if (xhr.responseJSON?.errors) {
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: msg
+                        });
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text('Update');
+                    }
+                });
+            });
+        });
 
         function loadKompetensi() {
 
@@ -688,6 +1192,18 @@
                                     const id = options.data.id;
                                     const $wrapper = $('<div>').addClass("flex gap-2 justify-center");
 
+                                    if (userPermissions.edit) {
+                                        $('<button>')
+                                            .addClass('p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition')
+                                            .attr('title', 'Edit')
+                                            .html('<i class="fas fa-edit"></i>')
+                                            .on('click', e => {
+                                                e.stopPropagation();
+                                                openEditModal(id);
+                                            })
+                                            .appendTo($wrapper);
+                                    }
+
                                     if (userPermissions.delete) {
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded hover:bg-red-700 transition')
@@ -723,30 +1239,6 @@
         }
 
 
-        function openEditModal(id) {
-
-            $.ajax({
-                url: "{{ route('kompetensi.show', ':id') }}".replace(':id', id),
-                type: 'GET',
-
-                success: function(data) {
-
-                    $('#edit_id').val(data.id);
-                    $('#edit_nama').val(data.nama);
-
-                    $('#modalEdit').removeClass('hidden').addClass('flex');
-                },
-
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Gagal mengambil data kategori.'
-                    });
-                }
-            });
-
-        }
 
         function deleteData(id) {
 

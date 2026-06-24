@@ -118,6 +118,8 @@ Route::get('/kompetensi-select', function (Request $request) {
         ->limit(10)
         ->get(['id', 'nama']);
 })->name('kompetensi.select');
+
+
 Route::post('/master-kompetensi/import', [MasterKompetensiController::class, 'import'])
     ->name('master-kompetensi.import');
 

@@ -417,25 +417,134 @@ class MasterKompetensiPelatihanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MasterKompetensiPelatihan $masterKompetensiPelatihan)
+    public function show($id)
     {
-        //
+        $data = MasterKompetensiPelatihan::with([
+            'kategori',
+            'kompetensi',
+            'departement',
+            'posisi',
+            'peran',
+            'workunit'
+        ])->findOrFail($id);
+
+        $items = MasterKompetensiPelatihan::where([
+            'id_kategori'    => $data->id_kategori,
+            'id_departement' => $data->id_departement,
+            'id_posisi'      => $data->id_posisi,
+            'id_peran'       => $data->id_peran,
+            'id_workunit'    => $data->id_workunit,
+        ])
+            ->select(
+                'id_kompetensi as kompetensi_id',
+                'nilai'
+            )
+            ->get();
+
+        return response()->json([
+            'id'              => $data->id,
+            'id_kategori'     => $data->id_kategori,
+            'id_departement'  => $data->id_departement,
+            'kategori'        => $data->kategori,
+            'departement'     => $data->departement,
+            'posisi'          => $data->posisi,
+            'peran'           => $data->peran,
+            'workunit'        => $data->workunit,
+            'items'           => $items,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(MasterKompetensiPelatihan $masterKompetensiPelatihan)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $validated = $request->validate([
+            'id_kategori' => 'required|integer',
+            'id_jabatan' => 'nullable|integer',
+            'id_posisi' => 'nullable|integer',
+            'id_workunit' => 'nullable|integer',
+            'department_id' => 'nullable|integer',
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, MasterKompetensiPelatihan $masterKompetensiPelatihan)
-    {
-        //
+            'kompetensi_id' => 'required|array|min:1',
+            'kompetensi_id.*' => 'required|integer',
+
+            'detail_kompetensi_id' => 'required|array|min:1',
+            'detail_kompetensi_id.*' => 'nullable|integer',
+        ]);
+
+        $user = Auth::user();
+
+        $employee = Employee::where('empToken', $user->empToken)->first();
+        if (!$employee) {
+            return response()->json([
+                'message' => 'Employee tidak ditemukan.'
+            ], 422);
+        }
+
+        $isSuperDepart = $user->departments
+            ->pluck('id')
+            ->intersect([5, 6])
+            ->isNotEmpty();
+
+        $departmentId = $isSuperDepart
+            ? ($validated['department_id'] ?? null)
+            : $employee->department_id;
+
+        if ($isSuperDepart && empty($departmentId)) {
+            return response()->json([
+                'message' => 'Department wajib dipilih.'
+            ], 422);
+        }
+
+        $old = MasterKompetensiPelatihan::findOrFail($id);
+
+        DB::beginTransaction();
+
+        try {
+            // Hapus semua row yang satu group dengan record lama
+            MasterKompetensiPelatihan::where([
+                'id_kategori'   => $old->id_kategori,
+                'id_posisi'     => $old->id_posisi,
+                'id_peran'      => $old->id_peran,
+                'id_workunit'   => $old->id_workunit,
+                'id_departement' => $old->id_departement,
+                'user_id'       => $old->user_id,
+            ])->delete();
+
+            // Simpan ulang seperti create
+            foreach ($validated['kompetensi_id'] as $index => $kompetensiId) {
+                $detailId = $validated['detail_kompetensi_id'][$index] ?? null;
+
+                if (empty($detailId)) {
+                    continue;
+                }
+
+                MasterKompetensiPelatihan::create([
+                    'id_kategori'    => $validated['id_kategori'],
+                    'id_kompetensi'  => $kompetensiId,
+                    'id_posisi'      => $validated['id_jabatan'] ?? null,
+                    'id_peran'       => $validated['id_posisi'] ?? null,
+                    'id_workunit'    => $validated['id_workunit'] ?? null,
+                    'id_departement' => $departmentId,
+                    'user_id'        => $user->id,
+                    'nilai'          => $detailId,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil diupdate'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat update data.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
