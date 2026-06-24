@@ -110,7 +110,10 @@ Route::get('/kompetensi-select', function (Request $request) {
     $search = $request->search;
 
     return MasterKompetensi::when($search, function ($q) use ($search) {
-        $q->where('nama', 'like', "%{$search}%");
+        $q->where(function ($query) use ($search) {
+            $query->where('nama', 'like', "%{$search}%")
+                ->orWhere('initial', 'like', "%{$search}%");
+        });
     })
         ->limit(10)
         ->get(['id', 'nama']);
