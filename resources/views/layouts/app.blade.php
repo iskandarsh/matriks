@@ -26,7 +26,7 @@
 
 
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/all.min.css">
 
     <script src="{{ env('APP_URL') }}/assets/js/jquery.dataTables.min.js"></script>
 

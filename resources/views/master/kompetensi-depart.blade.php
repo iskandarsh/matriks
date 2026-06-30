@@ -287,32 +287,7 @@
                     | FLATTEN DATA PER DEPARTMENT
                     |--------------------------------------------------------------------------
                     */
-                    const kompetensis = [];
-
-                    (data.kompetensi || []).forEach(item => {
-
-                        // jika tidak ada depart
-                        if (!item.departs || !item.departs.length) {
-
-                            kompetensis.push({
-                                ...item,
-                                depart_group: '-'
-                            });
-
-                            return;
-                        }
-
-                        // pecah per depart
-                        item.departs.forEach(dep => {
-
-                            kompetensis.push({
-                                ...item,
-                                depart_group: dep.depNama
-                            });
-
-                        });
-
-                    });
+                    const kompetensis = data.kompetensi || [];
 
                     const userPermissions = data.permissions || {};
 
@@ -476,15 +451,10 @@
                             |--------------------------------------------------------------------------
                             */
                             {
-                                dataField: 'depart_group',
                                 caption: 'Depart',
+                                alignment: 'left',
 
                                 calculateCellValue(rowData) {
-
-                                    if (rowData.depart_group) {
-                                        return rowData.depart_group;
-                                    }
-
                                     return (rowData.departs || [])
                                         .map(d => d.depNama)
                                         .join(', ');
@@ -502,7 +472,9 @@
                                     departs.forEach(dep => {
 
                                         $('<span>')
-                                            .addClass('inline-block rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 mr-1 mb-1')
+                                            .addClass(
+                                                'inline-block rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 mr-1 mb-1'
+                                            )
                                             .text(dep.depNama)
                                             .appendTo(container);
 
