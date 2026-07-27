@@ -60,30 +60,6 @@
         </div>
     </div>
 
-    {{-- ================= TEMPLATE 1 BLOK KATEGORI (dipakai create & edit) ================= --}}
-    <template id="tplKategoriBlock">
-        <div class="kategori-block border rounded-xl p-4 bg-gray-50 relative mb-3">
-            <button type="button"
-                class="btnRemoveKategoriBlock absolute top-3 right-3 text-red-500 text-sm hover:text-red-700">
-                <i class="fas fa-trash"></i>
-            </button>
-
-            <div>
-                <label class="text-sm font-medium">Kategori</label>
-                <select class="selectKategoriBlock w-full border rounded-lg p-2.5 mt-1"></select>
-            </div>
-
-            <div class="kompetensiWrapperBlock mt-4 hidden">
-                <label class="font-semibold text-gray-700 text-sm">Kompetensi &amp; Penilaian</label>
-
-                <div class="kompetensiLoadingBlock hidden text-sm text-gray-500 mt-2">
-                    Loading kompetensi...
-                </div>
-
-                <div class="kompetensiListBlock space-y-3 mt-3"></div>
-            </div>
-        </div>
-    </template>
 
     <div id="modalCreate"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-4">
@@ -133,19 +109,23 @@
                                 class="w-full border rounded-lg p-2.5 mt-1"></select>
                         </div>
 
-                    </div>
-
-                    <!-- KATEGORI (CLONEABLE) -->
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between">
-                            <label class="font-semibold text-gray-700">Kategori &amp; Kompetensi</label>
-                            <button type="button" id="btnAddKategoriCreate"
-                                class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-plus"></i> Tambah Kategori
-                            </button>
+                        <div>
+                            <label class="text-sm font-medium">Kategori</label>
+                            <select id="selectKategori" name="id_kategori"
+                                class="w-full border rounded-lg p-2.5 mt-1"></select>
                         </div>
 
-                        <div id="kategoriBlockContainerCreate" class="mt-3"></div>
+                    </div>
+
+                    <!-- AUTO KOMPETENSI -->
+                    <div id="kompetensiWrapper" class="mt-4 hidden">
+                        <label class="font-semibold text-gray-700">Kompetensi & Penilaian</label>
+
+                        <div id="kompetensiLoading" class="hidden text-sm text-gray-500 mt-2">
+                            Loading kompetensi...
+                        </div>
+
+                        <div id="kompetensiList" class="space-y-3 mt-3"></div>
                     </div>
 
                 </form>
@@ -243,19 +223,36 @@
                             </select>
                         </div>
 
-                    </div>
+                        <div>
+                            <label class="text-sm font-medium">
+                                Kategori
+                            </label>
 
-                    <!-- KATEGORI (CLONEABLE) -->
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between">
-                            <label class="font-semibold text-gray-700">Kategori &amp; Kompetensi</label>
-                            <button type="button" id="btnAddKategoriEdit"
-                                class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-plus"></i> Tambah Kategori
-                            </button>
+                            <select id="editKategori"
+                                name="id_kategori"
+                                class="w-full border rounded-lg p-2.5 mt-1">
+                            </select>
                         </div>
 
-                        <div id="kategoriBlockContainerEdit" class="mt-3"></div>
+                    </div>
+
+                    <!-- KOMPETENSI -->
+                    <div id="editKompetensiWrapper"
+                        class="mt-4 hidden">
+
+                        <label class="font-semibold text-gray-700">
+                            Kompetensi & Penilaian
+                        </label>
+
+                        <div id="editKompetensiLoading"
+                            class="hidden text-sm text-gray-500 mt-2">
+                            Loading kompetensi...
+                        </div>
+
+                        <div id="editKompetensiList"
+                            class="space-y-3 mt-3">
+                        </div>
+
                     </div>
 
                 </form>
@@ -310,7 +307,6 @@
             location.reload();
         });
     </script>
-
     <script>
         $(document).ready(function() {
 
@@ -319,10 +315,6 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-
-            // ============================================================
-            // DEPARTMENT (khusus super depart) - CREATE
-            // ============================================================
             if (isSuperDepart) {
                 $('#departmentWrapper').removeClass('hidden');
 
@@ -356,22 +348,28 @@
             $('#btnCreate').on('click', function() {
                 $('#modalCreate').removeClass('hidden').addClass('flex');
             });
-
             $('#btnCancel').on('click', function() {
                 $('#modalCreate').addClass('hidden').removeClass('flex');
                 $('#formCreate')[0].reset();
-                $('#kategoriBlockContainerCreate').empty();
-                addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
             });
 
             loadTable();
 
-            // JABATAN (CREATE)
+
+            setTimeout(() => {
+
+                initSelectTraining();
+
+            }, 200);
+
+
+            // JABATAN
             $('#selectJabatan').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Jabatan",
                 theme: "bootstrap-5",
                 width: '100%',
+
                 ajax: {
                     url: 'dropdown/jabatan',
                     dataType: 'json',
@@ -389,12 +387,15 @@
                 }
             });
 
-            // POSISI (CREATE)
+
+            // POSISI
             $('#selectPosisi').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Posisi",
                 theme: "bootstrap-5",
                 width: '100%',
+
+
                 ajax: {
                     url: 'dropdown/posisi',
                     dataType: 'json',
@@ -412,12 +413,13 @@
                 }
             });
 
-            // WORKUNIT (CREATE)
+            // WORKUNIT
             $('#selectWorkunit').select2({
                 dropdownParent: $('#modalCreate'),
                 placeholder: "Pilih Workunit",
                 theme: "bootstrap-5",
                 width: '100%',
+
                 ajax: {
                     url: 'dropdown/workunit',
                     dataType: 'json',
@@ -435,19 +437,15 @@
                 }
             });
 
-            // kalau department berubah -> reload kompetensi di SEMUA blok kategori (create)
             $('#selectDepartment').on('change', function() {
-                const departmentId = $(this).val();
-                $('#kategoriBlockContainerCreate .kategori-block').each(function() {
-                    const $block = $(this);
-                    const kategoriId = $block.find('.selectKategoriBlock').val();
-                    renderKompetensiForBlock($block, kategoriId, departmentId);
-                });
+                loadKompetensi();
             });
 
-            // ============================================================
-            // DEPARTMENT (khusus super depart) - EDIT
-            // ============================================================
+
+            $('#selectKategori').on('change', function() {
+                loadKompetensi();
+            });
+
             if (isSuperDepart) {
                 $('#editDepartmentWrapper').removeClass('hidden');
 
@@ -477,6 +475,23 @@
                     }
                 });
             }
+            $('#editKategori').select2({
+                dropdownParent: $('#modalEdit'),
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Pilih kategori',
+                ajax: {
+                    url: "{{ route('kategori.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+            });
 
             $('#editJabatan').select2({
                 dropdownParent: $('#modalEdit'),
@@ -531,331 +546,18 @@
                     })
                 }
             });
-
-            // kalau department berubah -> reload kompetensi di SEMUA blok kategori (edit)
-            $('#editDepartment').on('change', function() {
-                const departmentId = $(this).val();
-                $('#kategoriBlockContainerEdit .kategori-block').each(function() {
-                    const $block = $(this);
-                    const kategoriId = $block.find('.selectKategoriBlock').val();
-                    renderKompetensiForBlock($block, kategoriId, departmentId);
-                });
-            });
-
-            // ============================================================
-            // TOMBOL TAMBAH KATEGORI
-            // ============================================================
-            $('#btnAddKategoriCreate').on('click', function() {
-                addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
-            });
-
-            $('#btnAddKategoriEdit').on('click', function() {
-                addKategoriBlock($('#kategoriBlockContainerEdit'), '#modalEdit');
-            });
-
-            // sediakan 1 blok kosong begitu modal create pertama kali dibuka / halaman load
-            addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
         });
 
-        // ============================================================
-        // ADD KATEGORI BLOCK (CLONE) - dipakai create & edit
-        // ============================================================
-        function addKategoriBlock($container, modalSelector, prefillKategori = null, savedItems = [], departmentIdForPrefill = null) {
 
-            const tpl = document.getElementById('tplKategoriBlock').content.cloneNode(true);
-            $container.append(tpl);
-
-            const $blockInDom = $container.children('.kategori-block').last();
-
-            const $selectKategori = $blockInDom.find('.selectKategoriBlock');
-
-            $selectKategori.select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $(modalSelector),
-                placeholder: 'Pilih kategori',
-                ajax: {
-                    url: "{{ route('kategori.search') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
-            });
-
-            $blockInDom.find('.btnRemoveKategoriBlock').on('click', function() {
-                $blockInDom.remove();
-            });
-
-            function bindChangeHandler() {
-                $selectKategori.off('change').on('change', function() {
-                    const kategoriId = $(this).val();
-                    const departmentId = (modalSelector === '#modalCreate') ?
-                        $('#selectDepartment').val() :
-                        $('#editDepartment').val();
-
-                    renderKompetensiForBlock($blockInDom, kategoriId, departmentId);
-                });
-            }
-
-            if (prefillKategori) {
-                const opt = new Option(prefillKategori.text, prefillKategori.id, true, true);
-                // trigger namespaced 'select2' saja supaya tampilan select2 ter-update
-                // tanpa memicu handler 'change' biasa (yang akan fetch ulang tanpa savedItems)
-                $selectKategori.append(opt).trigger('change.select2');
-
-                renderKompetensiForBlock($blockInDom, prefillKategori.id, departmentIdForPrefill, savedItems);
-            }
-
-            bindChangeHandler();
-
-            return $blockInDom;
-        }
-
-        // ============================================================
-        // RENDER LIST KOMPETENSI + NILAI UNTUK 1 BLOK KATEGORI
-        // ============================================================
-        function renderKompetensiForBlock($block, kategoriId, departmentId, savedItems = []) {
-
-            const $wrapper = $block.find('.kompetensiWrapperBlock');
-            const $loading = $block.find('.kompetensiLoadingBlock');
-            const $list = $block.find('.kompetensiListBlock');
-
-            if (!kategoriId) {
-                $wrapper.addClass('hidden');
-                $list.html('');
-                return;
-            }
-
-            if (isSuperDepart && !departmentId) {
-                $wrapper.addClass('hidden');
-                $list.html('');
-                return;
-            }
-
-            $wrapper.removeClass('hidden');
-            $loading.removeClass('hidden');
-            $list.html('');
-
-            const savedMap = {};
-            savedItems.forEach(item => {
-                savedMap[item.kompetensi_id] = item.nilai;
-            });
-
-            $.ajax({
-                url: 'ajax/kompetensi',
-                type: 'GET',
-                data: {
-                    kategori_id: kategoriId,
-                    department_id: departmentId
-                },
-                success: function(res) {
-                    $loading.addClass('hidden');
-
-                    let html = '';
-
-                    if (!res.length) {
-                        html = `
-                            <div class="text-sm text-gray-500 italic">
-                                Tidak ada kompetensi pada kategori ini
-                            </div>
-                        `;
-                    }
-
-                    res.forEach(item => {
-
-                        let options = `<option value="">-- Pilih Nilai --</option>`;
-
-                        item.details.forEach(d => {
-
-                            const selected =
-                                String(savedMap[item.id] ?? '') === String(d.skala) ?
-                                'selected' : '';
-
-                            const desc = d.deskripsi ?? '';
-                            const shortDesc = desc.length > 40 ?
-                                desc.substring(0, 40) + '...' :
-                                desc;
-
-                            options += `
-                                <option value="${d.skala}" title="${desc}" ${selected}>
-                                    ${d.skala} - ${shortDesc}
-                                </option>
-                            `;
-                        });
-
-                        html += `
-                            <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                                    <div>
-                                        <input type="text"
-                                            value="${item.nama}"
-                                            readonly
-                                            class="w-full border rounded-lg p-2 bg-gray-50">
-                                    </div>
-
-                                    <div>
-                                        <select class="selectNilaiBlock w-full border rounded-lg p-2.5">
-                                            ${options}
-                                        </select>
-                                    </div>
-
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    $list.html(html);
-                },
-                error: function() {
-                    $loading.addClass('hidden');
-                    $list.html(`
-                        <div class="text-red-500 text-sm">
-                            Gagal mengambil data kompetensi
-                        </div>
-                    `);
-                }
-            });
-        }
-
-        // ============================================================
-        // KUMPULKAN SEMUA BLOK KATEGORI -> ARRAY groups[]
-        // ============================================================
-        function buildGroupsPayload($container) {
-            const groups = [];
-
-            $container.find('.kategori-block').each(function() {
-                const $block = $(this);
-                const idKategori = $block.find('.selectKategoriBlock').val();
-
-                if (!idKategori) return; // blok kosong, skip
-
-                const kompetensiIds = [];
-                const nilaiIds = [];
-
-                $block.find('.kompetensiRow').each(function() {
-                    const kompId = $(this).data('kompetensi-id');
-                    const nilai = $(this).find('.selectNilaiBlock').val();
-
-                    kompetensiIds.push(kompId);
-                    nilaiIds.push(nilai || '');
-                });
-
-                if (!kompetensiIds.length) return; // belum ada kompetensi, skip
-
-                groups.push({
-                    id_kategori: idKategori,
-                    kompetensi_id: kompetensiIds,
-                    detail_kompetensi_id: nilaiIds
-                });
-            });
-
-            return groups;
-        }
-
-        // ============================================================
-        // SUBMIT CREATE
-        // ============================================================
-        $('#formCreate').on('submit', function(e) {
-            e.preventDefault();
-
-            const groups = buildGroupsPayload($('#kategoriBlockContainerCreate'));
-
-            if (!groups.length) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Lengkapi data',
-                    text: 'Minimal 1 kategori dengan kompetensi & nilai harus diisi.'
-                });
-                return;
-            }
-
-            Swal.fire({
-                title: 'Simpan data?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, simpan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (!result.isConfirmed) return;
-
-                Swal.fire({
-                    title: 'Menyimpan...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                const payload = {
-                    id_jabatan: $('#selectJabatan').val(),
-                    id_posisi: $('#selectPosisi').val(),
-                    id_workunit: $('#selectWorkunit').val(),
-                    department_id: $('#selectDepartment').val(),
-                    groups: groups
-                };
-
-                $.ajax({
-                    url: "ikompetensi_pelatihan",
-                    type: "POST",
-                    data: payload,
-                    success: function(res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message ?? 'Data berhasil disimpan',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                        $('#modalCreate').addClass('hidden').removeClass('flex');
-                        $('#formCreate')[0].reset();
-
-                        $('#selectJabatan').val(null).trigger('change');
-                        $('#selectPosisi').val(null).trigger('change');
-                        $('#selectWorkunit').val(null).trigger('change');
-                        $('#selectDepartment').val(null).trigger('change');
-
-                        $('#kategoriBlockContainerCreate').empty();
-                        addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
-
-                        if (typeof loadTable === 'function') {
-                            loadTable();
-                        }
-                    },
-                    error: function(xhr) {
-                        let msg = 'Gagal menyimpan';
-
-                        if (xhr.responseJSON?.message) {
-                            msg = xhr.responseJSON.message;
-                        }
-
-                        if (xhr.responseJSON?.errors) {
-                            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: msg
-                        });
-                    }
-                });
-            });
-        });
-
-        // ============================================================
-        // OPEN EDIT MODAL (load groups dari server)
-        // ============================================================
         function openEditModal(id) {
             $('#formEdit')[0].reset();
             $('#edit_id').val('');
-            $('#kategoriBlockContainerEdit').empty();
+            $('#editKompetensiList').html('');
+            $('#editKompetensiWrapper').addClass('hidden');
+            editSavedItems = [];
 
             // reset select2 supaya value lama hilang
+            $('#editKategori').empty().trigger('change');
             $('#editJabatan').empty().trigger('change');
             $('#editPosisi').empty().trigger('change');
             $('#editWorkunit').empty().trigger('change');
@@ -866,6 +568,12 @@
                 type: 'GET',
                 success: function(res) {
                     $('#edit_id').val(res.id);
+
+                    // set select kategori
+                    if (res.kategori) {
+                        const optKategori = new Option(res.kategori.nama, res.kategori.id, true, true);
+                        $('#editKategori').append(optKategori).trigger('change');
+                    }
 
                     // set jabatan
                     if (res.posisi) {
@@ -891,28 +599,12 @@
                         $('#editDepartment').append(optDept).trigger('change');
                     }
 
-                    const departmentIdForPrefill = isSuperDepart ? res.department_id : null;
-
-                    const groups = res.groups ?? [];
-
-                    if (groups.length) {
-                        groups.forEach(group => {
-                            const prefillKategori = {
-                                id: group.id_kategori,
-                                text: group.kategori?.nama ?? ''
-                            };
-
-                            addKategoriBlock(
-                                $('#kategoriBlockContainerEdit'),
-                                '#modalEdit',
-                                prefillKategori,
-                                group.items ?? [],
-                                departmentIdForPrefill
-                            );
-                        });
-                    } else {
-                        addKategoriBlock($('#kategoriBlockContainerEdit'), '#modalEdit');
-                    }
+                    editSavedItems = res.items ?? [];
+                    loadKompetensiEdit(
+                        res.id_kategori,
+                        isSuperDepart ? res.department_id : null,
+                        editSavedItems
+                    );
 
                     $('#modalEdit').removeClass('hidden').addClass('flex');
                 },
@@ -926,22 +618,150 @@
             });
         }
 
-        // ============================================================
-        // SUBMIT EDIT
-        // ============================================================
+        function loadKompetensiEdit(
+            kategoriId = null,
+            departmentId = null,
+            savedItems = []
+        ) {
+            kategoriId =
+                kategoriId || $('#editKategori').val();
+
+            departmentId =
+                departmentId ||
+                $('#editDepartment').val();
+
+            if (!kategoriId) {
+                $('#editKompetensiWrapper')
+                    .addClass('hidden');
+                $('#editKompetensiList').html('');
+                return;
+            }
+
+            if (isSuperDepart && !departmentId) {
+                $('#editKompetensiWrapper')
+                    .addClass('hidden');
+                $('#editKompetensiList').html('');
+                return;
+            }
+
+            $('#editKompetensiWrapper')
+                .removeClass('hidden');
+
+            $('#editKompetensiLoading')
+                .removeClass('hidden');
+
+            $('#editKompetensiList').html('');
+
+            const savedMap = {};
+
+            savedItems.forEach(item => {
+                savedMap[item.kompetensi_id] =
+                    item.nilai;
+            });
+
+            $.ajax({
+                url: 'ajax/kompetensi',
+                type: 'GET',
+                data: {
+                    kategori_id: kategoriId,
+                    department_id: departmentId
+                },
+                success: function(res) {
+                    $('#editKompetensiLoading')
+                        .addClass('hidden');
+
+                    let html = '';
+
+                    if (!res.length) {
+                        html = `
+                    <div class="text-sm text-gray-500 italic">
+                        Tidak ada kompetensi pada kategori ini
+                    </div>
+                `;
+                    }
+
+                    res.forEach(item => {
+
+                        let options =
+                            `<option value="">-- Pilih Nilai --</option>`;
+
+                        item.details.forEach(d => {
+
+                            const selected =
+                                String(savedMap[item.id] ?? '') ===
+                                String(d.skala) ?
+                                'selected' :
+                                '';
+
+                            const desc =
+                                d.deskripsi ?? '';
+
+                            const shortDesc =
+                                desc.length > 40 ?
+                                desc.substring(0, 40) + '...' :
+                                desc;
+
+                            options += `
+                        <option
+                            value="${d.skala}"
+                            title="${desc}"
+                            ${selected}>
+                            ${d.skala} - ${shortDesc}
+                        </option>
+                    `;
+                        });
+
+                        html += `
+                    <div class="p-3 sm:p-4 rounded-xl border bg-white shadow-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <div>
+                                <input
+                                    type="hidden"
+                                    name="kompetensi_id[]"
+                                    value="${item.id}">
+
+                                <input
+                                    type="text"
+                                    value="${item.nama}"
+                                    readonly
+                                    class="w-full border rounded-lg p-2 bg-gray-50">
+                            </div>
+
+                            <div>
+                                <select
+                                    name="detail_kompetensi_id[]"
+                                    class="w-full border rounded-lg p-2.5">
+                                    ${options}
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+                    });
+
+                    $('#editKompetensiList').html(html);
+                },
+                error: function() {
+                    $('#editKompetensiLoading')
+                        .addClass('hidden');
+
+                    $('#editKompetensiList').html(`
+                <div class="text-red-500 text-sm">
+                    Gagal mengambil data kompetensi
+                </div>
+            `);
+                }
+            });
+        }
+
+
         $('#formEdit').on('submit', function(e) {
             e.preventDefault();
 
-            const groups = buildGroupsPayload($('#kategoriBlockContainerEdit'));
-
-            if (!groups.length) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Lengkapi data',
-                    text: 'Minimal 1 kategori dengan kompetensi & nilai harus diisi.'
-                });
-                return;
-            }
+            const form = this;
+            const submitBtn = $('[form="formEdit"]');
 
             Swal.fire({
                 title: 'Update data?',
@@ -958,19 +778,13 @@
                     didOpen: () => Swal.showLoading()
                 });
 
-                const payload = {
-                    _method: 'PUT',
-                    id_jabatan: $('#editJabatan').val(),
-                    id_posisi: $('#editPosisi').val(),
-                    id_workunit: $('#editWorkunit').val(),
-                    department_id: $('#editDepartment').val(),
-                    groups: groups
-                };
-
                 $.ajax({
                     url: `ikompetensi_pelatihan/${$('#edit_id').val()}`,
                     type: 'POST',
-                    data: payload,
+                    data: $(form).serialize(),
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Menyimpan...');
+                    },
                     success: function(res) {
                         Swal.fire({
                             icon: 'success',
@@ -982,7 +796,8 @@
 
                         $('#modalEdit').addClass('hidden').removeClass('flex');
                         $('#formEdit')[0].reset();
-                        $('#kategoriBlockContainerEdit').empty();
+                        $('#editKompetensiList').html('');
+                        $('#editKompetensiWrapper').addClass('hidden');
                         loadTable();
                     },
                     error: function(xhr) {
@@ -1001,15 +816,223 @@
                             title: 'Gagal',
                             text: msg
                         });
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text('Update');
                     }
                 });
             });
         });
 
-        // ============================================================
-        // GRID (DevExtreme) - tidak berubah dari sebelumnya
-        // ============================================================
+        function loadKompetensi() {
+
+            let kategoriId = $('#selectKategori').val();
+            let departmentId = $('#selectDepartment').val();
+
+            if (!kategoriId) {
+                $('#kompetensiWrapper').addClass('hidden');
+                $('#kompetensiList').html('');
+                return;
+            }
+
+            if (isSuperDepart && !departmentId) {
+                $('#kompetensiWrapper').addClass('hidden');
+                $('#kompetensiList').html('');
+                return;
+            }
+
+            $('#kompetensiWrapper').removeClass('hidden');
+            $('#kompetensiLoading').removeClass('hidden');
+            $('#kompetensiList').html('');
+
+            $.ajax({
+                url: 'ajax/kompetensi',
+                method: 'GET',
+                data: {
+                    kategori_id: kategoriId,
+                    department_id: departmentId
+                },
+                success: function(res) {
+
+                    $('#kompetensiLoading').addClass('hidden');
+
+                    let html = '';
+
+                    if (!res.length) {
+                        html = `
+                    <div class="text-sm text-gray-500 italic">
+                        Tidak ada kompetensi pada kategori ini
+                    </div>
+                `;
+                    }
+
+                    res.forEach(item => {
+
+                        let options =
+                            `<option value="">-- Pilih Nilai --</option>`;
+
+                        item.details.forEach(d => {
+
+                            let desc = d.deskripsi ?? '';
+                            let shortDesc = desc.length > 40 ?
+                                desc.substring(0, 40) + '...' :
+                                desc;
+
+                            options += `
+                        <option value="${d.skala}" title="${desc}">
+                            ${d.skala} - ${shortDesc}
+                        </option>
+                    `;
+                        });
+
+                        html += `
+                    <div class="p-3 sm:p-4 rounded-xl border bg-white shadow-sm hover:shadow transition">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <div>
+                                <input type="hidden"
+                                    name="kompetensi_id[]"
+                                    value="${item.id}">
+
+                                <input type="text"
+                                    value="${item.nama}"
+                                    readonly
+                                    class="w-full border rounded-lg p-2 bg-gray-50">
+                            </div>
+
+                            <div>
+                                <select name="detail_kompetensi_id[]"
+                                    class="w-full border rounded-lg p-2.5">
+                                    ${options}
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+                    });
+
+                    $('#kompetensiList').html(html);
+                },
+                error: function() {
+                    $('#kompetensiLoading').addClass('hidden');
+                    $('#kompetensiList').html(`
+                <div class="text-red-500 text-sm">
+                    Gagal mengambil data kompetensi
+                </div>
+            `);
+                }
+            });
+        }
+
+        function initSelectTraining() {
+
+            // =========================
+            // KATEGORI
+            // =========================
+            $('#selectKategori').select2({
+
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih kategori",
+
+                ajax: {
+                    url: "{{ route('kategori.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+
+            });
+
+
+            // =========================
+            // KOMPETENSI (TAGGING)
+            // =========================
+            $('#selectKompetensi').select2({
+
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih / ketik kompetensi",
+                tags: true,
+
+                ajax: {
+                    url: "{{ route('kompetensi.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term,
+                        kategori: $('#selectKategori').val()
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+
+            });
+
+
+
+            // =========================
+            // MATERI MULTIPLE
+            // =========================
+            $('#selectMateri').select2({
+
+                theme: "bootstrap-5",
+                width: '100%',
+                dropdownParent: $('#modalCreate'),
+                placeholder: "Pilih materi pelatihan",
+                multiple: true,
+
+                ajax: {
+                    url: "{{ route('materi.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term,
+                        kompetensi: $('#selectKompetensi').val()
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                }
+
+            });
+
+
+            // =========================
+            // RESET CHAIN LOGIC
+            // =========================
+
+            // kategori berubah → reset kompetensi + materi
+            $('#selectKategori').on('change', function() {
+
+                $('#selectKompetensi').val(null).trigger('change');
+                $('#selectMateri').val(null).trigger('change');
+
+            });
+
+            // kompetensi berubah → reset materi
+            $('#selectKompetensi').on('change', function() {
+
+                $('#selectMateri').val(null).trigger('change');
+
+            });
+
+        }
+
+
         let gridInstance = null;
+        const badgeClass = "inline-block rounded px-2 py-1 text-xs font-semibold";
 
         function loadTable() {
             const gridId = 'grid';
@@ -1021,18 +1044,21 @@
                     const rows = data.data;
                     const userPermissions = data.permissions || {};
 
+                    // ✅ OPTIMIZED: If grid exists, just update data instead of destroying/recreating
                     if (gridInstance) {
                         gridInstance.option('dataSource', rows);
                         return;
                     }
 
+                    // ✅ INITIALIZE GRID
                     gridInstance = $container.dxDataGrid({
                         dataSource: rows,
                         keyExpr: 'id',
                         rowAlternationEnabled: true,
                         columnAutoWidth: true,
-                        showBorders: true,
+                        showBorders: true, // Optional: better UI
 
+                        // ✅ GROUPING CONFIG
                         groupPanel: {
                             visible: true,
                             emptyPanelText: "Drag a column header here to group by that column"
@@ -1042,10 +1068,9 @@
                         },
                         allowColumnReordering: true,
 
+                        // ✅ UTILITIES
                         columnChooser: {
-                            enabled: true,
-                            mode: "select",
-                            allowSearch: true
+                            enabled: true
                         },
                         searchPanel: {
                             visible: true,
@@ -1058,6 +1083,12 @@
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
                             showInfo: true
+                        },
+
+                        columnChooser: {
+                            enabled: true,
+                            mode: "select",
+                            allowSearch: true
                         },
 
                         columnHidingEnabled: false,
@@ -1098,6 +1129,7 @@
                                 }
                             },
 
+                            // ✅ GROUP 1
                             {
                                 caption: 'Kategori',
                                 dataField: 'kategori.nama',
@@ -1105,6 +1137,7 @@
                                 groupIndex: 0
                             },
 
+                            // ✅ GROUP 2 (GANTI DARI KOMPETENSI → DEPARTEMENT)
                             {
                                 caption: 'Departement',
                                 dataField: 'departement.depNama',
@@ -1112,6 +1145,7 @@
                                 groupIndex: 1
                             },
 
+                            // ❌ HAPUS GROUP KOMPETENSI (jadi normal column aja)
                             {
                                 caption: 'Kompetensi',
                                 dataField: 'kompetensi.nama',
@@ -1134,6 +1168,13 @@
                                 calculateCellValue: row => row.workunit?.woruNama ?? '-'
                             },
 
+                            // ❌ HAPUS INI
+                            // {
+                            //     caption: 'Materi',
+                            //     dataField: 'materi.title',
+                            // },
+
+                            // ✅ TAMBAH NILAI
                             {
                                 caption: 'Nilai',
                                 dataField: 'nilai',
@@ -1193,12 +1234,15 @@
                 })
                 .catch(err => {
                     console.error("Load Table Error:", err);
+                    // Optional: Show alert if fetch fails
                 });
         }
 
+
+
         function deleteData(id) {
 
-            return Swal.fire({
+            Swal.fire({
                 title: 'Hapus data?',
                 text: 'Data yang sudah dihapus tidak bisa dikembalikan.',
                 icon: 'warning',
@@ -1219,7 +1263,7 @@
                     }
                 });
 
-                return fetch(`ikompetensi_pelatihan/${id}`, {
+                fetch(`ikompetensi_pelatihan/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -1237,7 +1281,7 @@
                             showConfirmButton: false
                         });
 
-                        loadTable();
+                        loadTable(); // reload grid
                     })
                     .catch(() => {
 
@@ -1252,6 +1296,175 @@
             });
 
         }
+
+        $('#formCreate').on('submit', function(e) {
+            e.preventDefault();
+
+            const form = this;
+            const submitBtn = $('[form="formCreate"]');
+
+            // validasi sederhana: pastikan semua nilai kompetensi sudah dipilih
+            let isValid = true;
+            $('select[name="detail_kompetensi_id[]"]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('border-red-500');
+                } else {
+                    $(this).removeClass('border-red-500');
+                }
+            });
+
+            // if (!isValid) {
+            //     Swal.fire({
+            //         icon: 'warning',
+            //         title: 'Lengkapi data',
+            //         text: 'Semua nilai kompetensi wajib dipilih.'
+            //     });
+            //     return;
+            // }
+
+            Swal.fire({
+                title: 'Simpan data?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, simpan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: 'Menyimpan...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const formData = new FormData(form);
+
+                $.ajax({
+                    url: "ikompetensi_pelatihan",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Menyimpan...');
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message ?? 'Data berhasil disimpan',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        $('#modalCreate').addClass('hidden');
+
+                        form.reset();
+                        $('#kompetensiList').html('');
+                        $('#kompetensiWrapper').addClass('hidden');
+
+                        $('#selectKategori').val(null).trigger('change');
+                        $('#selectJabatan').val(null).trigger('change');
+                        $('#selectPosisi').val(null).trigger('change');
+                        $('#selectWorkunit').val(null).trigger('change');
+
+                        if (typeof loadTable === 'function') {
+                            loadTable();
+                        }
+                    },
+                    error: function(xhr) {
+                        let msg = 'Gagal menyimpan';
+
+                        if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+
+                        if (xhr.responseJSON?.errors) {
+                            msg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: msg
+                        });
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text('Simpan');
+                    }
+                });
+            });
+        });
+
+
+        $('#formEditKategori').on('submit', function(e) {
+
+            e.preventDefault();
+
+            let id = $('#edit_id').val();
+
+            $.ajax({
+                url: "{{ route('kompetensi.update', ':id') }}".replace(':id', id),
+                type: "POST",
+                data: $(this).serialize(),
+
+                success: function(res) {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sukses',
+                        text: res.message
+                    });
+
+                    $('#modalEdit').addClass('hidden');
+
+                    loadTable();
+                },
+
+                error: function(xhr) {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON?.message ?? 'Gagal update'
+                    });
+
+                }
+
+            });
+
+        });
+
+        $('#skema').change(function() {
+
+            let skema = $(this).val();
+
+            $('#fieldJabatan').addClass('hidden');
+            $('#fieldPosisi').addClass('hidden');
+            $('#fieldWorkunit').addClass('hidden');
+            $('#fieldKategori').addClass('hidden');
+            if (skema != 'umum') {
+                $('#fieldKategori').removeClass('hidden');
+            }
+            if (skema == 'jabatan') {
+                $('#fieldJabatan').removeClass('hidden');
+            }
+
+            if (skema == 'posisi') {
+                $('#fieldPosisi').removeClass('hidden');
+            }
+
+            if (skema == 'workunit') {
+                $('#fieldWorkunit').removeClass('hidden');
+            }
+
+        });
     </script>
+
+
 
 </x-app-layout>
