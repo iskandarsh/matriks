@@ -557,6 +557,17 @@
             addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
         });
 
+        // Ambil semua id kategori yang sudah dipakai di blok lain (kecuali blok yang sedang di-edit)
+        function getUsedKategoriIds($container, $excludeBlock) {
+            const ids = [];
+            $container.find('.kategori-block').each(function() {
+                if (this === $excludeBlock[0]) return; // skip blok sendiri
+                const val = $(this).find('.selectKategoriBlock').val();
+                if (val) ids.push(String(val));
+            });
+            return ids;
+        }
+
         // ============================================================
         // ADD KATEGORI BLOCK (CLONE) - dipakai create & edit
         // ============================================================
@@ -581,9 +592,13 @@
                     data: params => ({
                         q: params.term
                     }),
-                    processResults: data => ({
-                        results: data
-                    })
+                    processResults: (data) => {
+                        const usedIds = getUsedKategoriIds($container, $blockInDom);
+                        const filtered = data.filter(item => !usedIds.includes(String(item.id)));
+                        return {
+                            results: filtered
+                        };
+                    }
                 }
             });
 
@@ -594,6 +609,24 @@
             function bindChangeHandler() {
                 $selectKategori.off('change').on('change', function() {
                     const kategoriId = $(this).val();
+
+                    if (kategoriId) {
+                        const usedIds = getUsedKategoriIds($container, $blockInDom);
+                        if (usedIds.includes(String(kategoriId))) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Kategori sudah dipilih',
+                                text: 'Kategori ini sudah digunakan pada blok lain. Silakan pilih kategori yang berbeda.'
+                            });
+
+                            // reset pilihan yang barusan dipilih
+                            $(this).val(null).trigger('change.select2');
+                            $blockInDom.find('.kompetensiWrapperBlock').addClass('hidden');
+                            $blockInDom.find('.kompetensiListBlock').html('');
+                            return;
+                        }
+                    }
+
                     const departmentId = (modalSelector === '#modalCreate') ?
                         $('#selectDepartment').val() :
                         $('#editDepartment').val();
@@ -601,7 +634,6 @@
                     renderKompetensiForBlock($blockInDom, kategoriId, departmentId);
                 });
             }
-
             if (prefillKategori) {
                 const opt = new Option(prefillKategori.text, prefillKategori.id, true, true);
                 // trigger namespaced 'select2' saja supaya tampilan select2 ter-update
@@ -670,46 +702,48 @@
 
                         let options = `<option value="">-- Pilih Nilai --</option>`;
 
-                        item.details.forEach(d => {
+                        item.details
+                            .sort((a, b) => Number(a.skala) - Number(b.skala))
+                            .forEach(d => {
 
-                            const selected =
-                                String(savedMap[item.id] ?? '') === String(d.skala) ?
-                                'selected' : '';
+                                const selected =
+                                    String(savedMap[item.id] ?? '') === String(d.skala) ?
+                                    'selected' :
+                                    '';
 
-                            const desc = d.deskripsi ?? '';
-                            const shortDesc = desc.length > 40 ?
-                                desc.substring(0, 40) + '...' :
-                                desc;
+                                const desc = d.deskripsi ?? '';
+                                const shortDesc = desc.length > 40 ?
+                                    desc.substring(0, 40) + '...' :
+                                    desc;
 
-                            options += `
-                                <option value="${d.skala}" title="${desc}" ${selected}>
-                                    ${d.skala} - ${shortDesc}
-                                </option>
-                            `;
-                        });
+                                options += `
+                <option value="${d.skala}" title="${desc}" ${selected}>
+                    ${d.skala} - ${shortDesc}
+                </option>
+            `;
+                            });
 
                         html += `
-                            <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                                    <div>
-                                        <input type="text"
-                                            value="${item.nama}"
-                                            readonly
-                                            class="w-full border rounded-lg p-2 bg-gray-50">
-                                    </div>
+                <div>
+                    <input type="text"
+                        value="${item.nama}"
+                        readonly
+                        class="w-full border rounded-lg p-2 bg-gray-50">
+                </div>
 
-                                    <div>
-                                        <select class="selectNilaiBlock w-full border rounded-lg p-2.5">
-                                            ${options}
-                                        </select>
-                                    </div>
+                <div>
+                    <select class="selectNilaiBlock w-full border rounded-lg p-2.5">
+                        ${options}
+                    </select>
+                </div>
 
-                                </div>
-                            </div>
-                        `;
+            </div>
+        </div>
+    `;
                     });
-
                     $list.html(html);
                 },
                 error: function() {
@@ -1162,7 +1196,17 @@
                                             })
                                             .appendTo($wrapper);
                                     }
-
+                                    if (userPermissions.edit) {
+                                        $('<button>')
+                                            .addClass('p-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition')
+                                            .attr('title', 'Clone')
+                                            .html('<i class="fas fa-copy"></i>')
+                                            .on('click', e => {
+                                                e.stopPropagation();
+                                                openCloneModal(id);
+                                            })
+                                            .appendTo($wrapper);
+                                    }
                                     if (userPermissions.delete) {
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded hover:bg-red-700 transition')
@@ -1194,6 +1238,67 @@
                 .catch(err => {
                     console.error("Load Table Error:", err);
                 });
+        }
+
+        // ============================================================
+        // OPEN CLONE MODAL (buka modal CREATE, prefill department+kategori+nilai)
+        // jabatan / posisi / workunit SENGAJA dikosongkan
+        // ============================================================
+        function openCloneModal(id) {
+            $('#formCreate')[0].reset();
+            $('#kategoriBlockContainerCreate').empty();
+
+            // kosongkan jabatan/posisi/workunit -> user wajib isi baru
+            $('#selectJabatan').empty().trigger('change');
+            $('#selectPosisi').empty().trigger('change');
+            $('#selectWorkunit').empty().trigger('change');
+            $('#selectDepartment').empty().trigger('change');
+
+            $.ajax({
+                url: `ikompetensi_pelatihan/${id}`,
+                type: 'GET',
+                success: function(res) {
+
+                    // Department di-clone (kalau super depart)
+                    if (isSuperDepart && res.departement) {
+                        const optDept = new Option(res.departement.depNama, res.departement.id, true, true);
+                        $('#selectDepartment').append(optDept).trigger('change');
+                    }
+
+                    const departmentIdForPrefill = isSuperDepart ? res.department_id : null;
+                    const groups = res.groups ?? [];
+
+                    // Kategori & Nilai di-clone dari data lama
+                    if (groups.length) {
+                        groups.forEach(group => {
+                            const prefillKategori = {
+                                id: group.id_kategori,
+                                text: group.kategori?.nama ?? ''
+                            };
+
+                            addKategoriBlock(
+                                $('#kategoriBlockContainerCreate'),
+                                '#modalCreate',
+                                prefillKategori,
+                                group.items ?? [],
+                                departmentIdForPrefill
+                            );
+                        });
+                    } else {
+                        addKategoriBlock($('#kategoriBlockContainerCreate'), '#modalCreate');
+                    }
+
+                    // Jabatan, Posisi, Workunit sengaja TIDAK di-set -> user isi manual
+                    $('#modalCreate').removeClass('hidden').addClass('flex');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Data tidak ditemukan'
+                    });
+                }
+            });
         }
 
         function deleteData(id) {

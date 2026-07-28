@@ -65,6 +65,8 @@ class MasterKompetensiPelatihanController extends Controller
     | SEARCH KOMPETENSI (FILTER BY KATEGORI)
     |--------------------------------------------------------------------------
     */
+
+
     public function searchKompetensi(Request $r)
     {
         $q = $r->q;
@@ -223,6 +225,7 @@ class MasterKompetensiPelatihanController extends Controller
             'departement',
         ])->findOrFail($id);
 
+        // dd($id);
         $records = MasterKompetensiPelatihan::with('kategori')
             ->where([
                 'id_posisi'      => $data->id_posisi,
@@ -246,6 +249,7 @@ class MasterKompetensiPelatihanController extends Controller
                 ];
             })
             ->values();
+
 
         return response()->json([
             'id'             => $data->id,
