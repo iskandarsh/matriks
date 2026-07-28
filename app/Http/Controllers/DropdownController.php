@@ -45,7 +45,7 @@ class DropdownController extends Controller
                 return response()->json([]);
         }
 
-        $data = $query->limit(10)->get();
+        $data = $query->limit(50)->get();
 
         return response()->json(
             $data->map(function ($item) {
