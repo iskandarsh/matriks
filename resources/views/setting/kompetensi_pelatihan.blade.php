@@ -1384,18 +1384,13 @@
                         loadTable();
                     })
                     .catch(() => {
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
                             text: 'Gagal menghapus data'
                         });
-
                     });
-
             });
-
         }
     </script>
-
 </x-app-layout>
