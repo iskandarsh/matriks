@@ -88,7 +88,7 @@
     <div id="modalCreate"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-4">
 
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl
                 max-h-[95vh] flex flex-col">
 
             <!-- HEADER (FIXED) -->
@@ -172,7 +172,7 @@
     <div id="modalEdit"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-2 sm:p-4">
 
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl
             max-h-[95vh] flex flex-col">
 
             <!-- HEADER -->
@@ -318,6 +318,22 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
+
+            // ============================================================
+            // HIGHLIGHT KARTU NILAI YANG DIPILIH (radio card Kompetensi & Penilaian)
+            // ============================================================
+            $(document).on('change', '.selectNilaiRadio', function() {
+                const $label = $(this).closest('.nilaiOptionLabel');
+                const $group = $label.closest('.nilaiOptionsGroup');
+
+                $group.find('.nilaiOptionLabel')
+                    .removeClass('border-blue-500 bg-blue-50 ring-1 ring-blue-500')
+                    .addClass('border-gray-200 bg-white');
+
+                $label
+                    .removeClass('border-gray-200 bg-white')
+                    .addClass('border-blue-500 bg-blue-50 ring-1 ring-blue-500');
             });
 
             // ============================================================
@@ -578,6 +594,11 @@
 
             const $blockInDom = $container.children('.kategori-block').last();
 
+            // beri id unik ke tiap blok kategori, supaya radio "nilai" antar blok
+            // (dan antar kompetensi yang sama di blok berbeda) tidak saling bentrok
+            const blockUid = 'blk' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            $blockInDom.attr('data-block-uid', blockUid);
+
             const $selectKategori = $blockInDom.find('.selectKategoriBlock');
 
             $selectKategori.select2({
@@ -650,6 +671,8 @@
 
         // ============================================================
         // RENDER LIST KOMPETENSI + NILAI UNTUK 1 BLOK KATEGORI
+        // Ditampilkan sebagai kartu pilihan (radio card) full-text -- skala &
+        // deskripsi lengkap langsung kelihatan, tidak terpotong / butuh hover.
         // ============================================================
         function renderKompetensiForBlock($block, kategoriId, departmentId, savedItems = []) {
 
@@ -678,6 +701,13 @@
                 savedMap[item.kompetensi_id] = item.nilai;
             });
 
+            const blockUid = $block.attr('data-block-uid') ||
+                (() => {
+                    const uid = 'blk' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+                    $block.attr('data-block-uid', uid);
+                    return uid;
+                })();
+
             $.ajax({
                 url: 'ajax/kompetensi',
                 type: 'GET',
@@ -700,50 +730,59 @@
 
                     res.forEach(item => {
 
-                        let options = `<option value="">-- Pilih Nilai --</option>`;
+                        const radioName = `nilai_${blockUid}_${item.id}`;
+                        const currentVal = String(savedMap[item.id] ?? '');
 
-                        item.details
-                            .sort((a, b) => Number(a.skala) - Number(b.skala))
-                            .forEach(d => {
+                        const sortedDetails = [...item.details].sort((a, b) => Number(a.skala) - Number(b.skala));
 
-                                const selected =
-                                    String(savedMap[item.id] ?? '') === String(d.skala) ?
-                                    'selected' :
-                                    '';
+                        let optionsHtml = '';
 
+                        if (!sortedDetails.length) {
+                            optionsHtml = `
+                                <div class="text-xs text-gray-400 italic px-1 col-span-full">
+                                    Belum ada skala penilaian untuk kompetensi ini
+                                </div>
+                            `;
+                        } else {
+                            sortedDetails.forEach(d => {
+                                const isChecked = currentVal === String(d.skala);
                                 const desc = d.deskripsi ?? '';
-                                const shortDesc = desc.length > 40 ?
-                                    desc.substring(0, 40) + '...' :
-                                    desc;
 
-                                options += `
-                <option value="${d.skala}" title="${desc}" ${selected}>
-                    ${d.skala} - ${shortDesc}
-                </option>
-            `;
+                                optionsHtml += `
+                                    <label class="nilaiOptionLabel flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition
+                                        hover:border-blue-400 hover:bg-blue-50/60
+                                        ${isChecked ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 bg-white'}">
+                                        <input type="radio"
+                                            name="${radioName}"
+                                            value="${d.skala}"
+                                            class="selectNilaiRadio mt-1 accent-blue-600"
+                                            ${isChecked ? 'checked' : ''}>
+                                        <span class="flex-1">
+                                            <span class="block text-sm font-semibold text-gray-800">
+                                                Skala ${d.skala}
+                                            </span>
+                                            ${desc ? `<span class="block text-xs text-gray-500 leading-snug mt-0.5">${desc}</span>` : ''}
+                                        </span>
+                                    </label>
+                                `;
                             });
+                        }
 
                         html += `
-        <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
+                                <div class="mb-3">
+                                    <span class="block text-sm font-semibold text-gray-800 bg-gray-50 border rounded-lg px-3 py-2">
+                                        ${item.nama}
+                                    </span>
+                                </div>
 
-                <div>
-                    <input type="text"
-                        value="${item.nama}"
-                        readonly
-                        class="w-full border rounded-lg p-2 bg-gray-50">
-                </div>
-
-                <div>
-                    <select class="selectNilaiBlock w-full border rounded-lg p-2.5">
-                        ${options}
-                    </select>
-                </div>
-
-            </div>
-        </div>
-    `;
+                                <div class="nilaiOptionsGroup grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    ${optionsHtml}
+                                </div>
+                            </div>
+                        `;
                     });
+
                     $list.html(html);
                 },
                 error: function() {
@@ -774,7 +813,7 @@
 
                 $block.find('.kompetensiRow').each(function() {
                     const kompId = $(this).data('kompetensi-id');
-                    const nilai = $(this).find('.selectNilaiBlock').val();
+                    const nilai = $(this).find('.selectNilaiRadio:checked').val();
 
                     kompetensiIds.push(kompId);
                     nilaiIds.push(nilai || '');
