@@ -735,52 +735,73 @@
 
                         const sortedDetails = [...item.details].sort((a, b) => Number(a.skala) - Number(b.skala));
 
-                        let optionsHtml = '';
+                        // Opsi "Tidak Ada" selalu tersedia, karena tidak semua kompetensi perlu skala
+                        const isNoneChecked = currentVal === '';
 
-                        if (!sortedDetails.length) {
-                            optionsHtml = `
-                                <div class="text-xs text-gray-400 italic px-1 col-span-full">
-                                    Belum ada skala penilaian untuk kompetensi ini
-                                </div>
-                            `;
-                        } else {
+                        let optionsHtml = `
+        <label class="nilaiOptionLabel flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition
+            hover:border-gray-400 hover:bg-gray-50
+            ${isNoneChecked ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 bg-white'}">
+            <input type="radio"
+                name="${radioName}"
+                value=""
+                class="selectNilaiRadio mt-1 accent-gray-500"
+                ${isNoneChecked ? 'checked' : ''}>
+            <span class="flex-1">
+                <span class="block text-sm font-semibold text-gray-600">
+                    Tidak Ada
+                </span>
+                <span class="block text-xs text-gray-400 leading-snug mt-0.5">
+                    Kompetensi ini tidak memerlukan penilaian skala
+                </span>
+            </span>
+        </label>
+    `;
+
+                        if (sortedDetails.length) {
                             sortedDetails.forEach(d => {
                                 const isChecked = currentVal === String(d.skala);
                                 const desc = d.deskripsi ?? '';
 
                                 optionsHtml += `
-                                    <label class="nilaiOptionLabel flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition
-                                        hover:border-blue-400 hover:bg-blue-50/60
-                                        ${isChecked ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 bg-white'}">
-                                        <input type="radio"
-                                            name="${radioName}"
-                                            value="${d.skala}"
-                                            class="selectNilaiRadio mt-1 accent-blue-600"
-                                            ${isChecked ? 'checked' : ''}>
-                                        <span class="flex-1">
-                                            <span class="block text-sm font-semibold text-gray-800">
-                                                Skala ${d.skala}
-                                            </span>
-                                            ${desc ? `<span class="block text-xs text-gray-500 leading-snug mt-0.5">${desc}</span>` : ''}
-                                        </span>
-                                    </label>
-                                `;
+                <label class="nilaiOptionLabel flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition
+                    hover:border-blue-400 hover:bg-blue-50/60
+                    ${isChecked ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 bg-white'}">
+                    <input type="radio"
+                        name="${radioName}"
+                        value="${d.skala}"
+                        class="selectNilaiRadio mt-1 accent-blue-600"
+                        ${isChecked ? 'checked' : ''}>
+                    <span class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-800">
+                            Skala ${d.skala}
+                        </span>
+                        ${desc ? `<span class="block text-xs text-gray-500 leading-snug mt-0.5">${desc}</span>` : ''}
+                    </span>
+                </label>
+            `;
                             });
+                        } else {
+                            optionsHtml += `
+            <div class="text-xs text-gray-400 italic px-1 col-span-full">
+                Belum ada skala penilaian untuk kompetensi ini
+            </div>
+        `;
                         }
 
                         html += `
-                            <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
-                                <div class="mb-3">
-                                    <span class="block text-sm font-semibold text-gray-800 bg-gray-50 border rounded-lg px-3 py-2">
-                                        ${item.nama}
-                                    </span>
-                                </div>
+        <div class="kompetensiRow p-3 sm:p-4 rounded-xl border bg-white shadow-sm" data-kompetensi-id="${item.id}">
+            <div class="mb-3">
+                <span class="block text-sm font-semibold text-gray-800 bg-gray-50 border rounded-lg px-3 py-2">
+                    ${item.nama}
+                </span>
+            </div>
 
-                                <div class="nilaiOptionsGroup grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    ${optionsHtml}
-                                </div>
-                            </div>
-                        `;
+            <div class="nilaiOptionsGroup grid grid-cols-1 sm:grid-cols-2 gap-2">
+                ${optionsHtml}
+            </div>
+        </div>
+    `;
                     });
 
                     $list.html(html);
