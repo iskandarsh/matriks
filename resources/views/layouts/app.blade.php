@@ -27,7 +27,6 @@
 
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/all.min.css">
-
     <script src="{{ env('APP_URL') }}/assets/js/jquery.dataTables.min.js"></script>
 
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/select2bootstrap.min.css">
@@ -49,7 +48,6 @@
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="{{ env('APP_URL') }}/assets/css/flatpickr.min.css">
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script> -->
 </head>
 
 <style>
@@ -62,7 +60,7 @@
     }
 </style>
 
-<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
+<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900">
 
     <div class="min-h-screen flex">
 
@@ -112,10 +110,12 @@
                 <div x-show="!collapsed" class="mb-5 px-2 select-none" x-transition:enter="transition ease-out duration-200">
                     <div class="space-y-1">
                         <h2 class="text-base font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                            Matriks Interbat
+                            Training Interbat
                         </h2>
-                        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                            Development & Matriks Management System
+                        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
+                            data-id="Sistem Manajemen Pengembangan & Pelatihan"
+                            data-en="Development & Training Management System">
+                            Development & Training Management System
                         </p>
                     </div>
                     <div class="mt-4 h-px bg-gradient-to-r from-gray-200 via-gray-200/30 to-transparent dark:from-gray-700 dark:via-gray-700/30 dark:to-transparent"></div>
@@ -125,6 +125,7 @@
                 <div x-show="!collapsed" class="px-2" x-transition:enter="transition ease-out duration-200">
                     <div class="relative">
                         <input type="text" id="menuSearch" placeholder="Cari menu..."
+                            data-id-placeholder="Cari menu..." data-en-placeholder="Search menu..."
                             class="w-full pl-9 pr-3 py-2 border rounded-xl text-xs text-gray-800 dark:text-gray-200 bg-white/40 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm"
                             {{ $menuDisabled ? 'disabled' : '' }} />
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
@@ -168,6 +169,10 @@
                     $isActive = ($menu->id === session('active_menu_id')) || $menu->children->contains(fn($child) => $child->id === session('active_menu_id'));
                     $hasChildren = $menu->children->isNotEmpty();
 
+                    // Label bilingual (fallback ke __($menu->name) jika kolom label_id / label_en belum ada / kosong)
+                    $menuLabelId = __($menu->name);
+                    $menuLabelEn = $menu->name_en ?: $menuLabelId;
+
                     // Logic Auto-Expand: Jika sidebar tertutup, klik menu akan membuka sidebar sekaligus dropdown
                     $menuClick = $hasChildren ? "if(collapsed) { collapsed = false; open = true; } else { open = !open; }" : menuClickScript($menu->id, $menu->route, $menuDisabled);
 
@@ -199,6 +204,7 @@
                             @click.prevent="{{ $menuClick }}"
                             :active="$isActive"
                             title="{{ __($menu->name) }}"
+                            data-id-title="{{ $menuLabelId }}" data-en-title="{{ $menuLabelEn }}"
                             :class="collapsed ? 'justify-center p-2' : 'justify-between px-3 py-2.5'"
                             class="parent-menu flex items-center rounded-xl text-xs font-medium tracking-wide transition-all duration-200 group relative
                     {{ $isActive 
@@ -209,12 +215,16 @@
                             <!-- Style saat Terbuka -->
                             <div x-show="!collapsed" class="flex items-center gap-3">
                                 <span class="w-1.5 h-1.5 rounded-full transition-colors {{ $isActive ? 'bg-blue-500' : 'bg-gray-400 dark:bg-gray-500 group-hover:bg-gray-600' }}"></span>
-                                <span class="truncate text-sm">{{ __($menu->name) }}</span>
+                                <span class="truncate text-sm"
+                                    data-id="{{ $menuLabelId }}"
+                                    data-en="{{ $menuLabelEn }}">{{ __($menu->name) }}</span>
                             </div>
 
                             <!-- Style Modern Saat Tertutup (Menampilkan Inisial Huruf) -->
                             <div x-show="collapsed" class="flex items-center justify-center w-8 h-8 rounded-lg {{ $isActive ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-transparent text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700' }} transition-all">
-                                <span class="font-bold text-[13px]">{{ $menuInitial }}</span>
+                                <span class="font-bold text-[13px]"
+                                    data-id="{{ mb_strtoupper(mb_substr($menuLabelId, 0, 1)) }}"
+                                    data-en="{{ mb_strtoupper(mb_substr($menuLabelEn, 0, 1)) }}">{{ $menuInitial }}</span>
                             </div>
 
                             <!-- Indikator Badge / Arrow saat Terbuka -->
@@ -246,6 +256,9 @@
                         <div x-show="open && !collapsed" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="pl-4 mt-1 space-y-0.5 border-l-2 border-gray-100 dark:border-gray-800 ml-[15px]">
                             @foreach($menu->children as $child)
                             @php
+                            $childLabelId = __($child->name);
+                            $childLabelEn = $child->name_en ?: $childLabelId;
+
                             $childClick = menuClickScript($child->id, $child->route, $menuDisabled);
                             $childHref = $child->route ? route($child->route) : '#';
                             $childActive = $child->id === session('active_menu_id');
@@ -268,7 +281,9 @@
                             : 'text-gray-800 dark:text-white hover:bg-blue-200 dark:hover:bg-gray-600' }}
                         {{ $menuDisabled ? 'opacity-50 pointer-events-none' : '' }}">
 
-                                <span class="truncate text-sm">{{ __($child->name) }}</span>
+                                <span class="truncate text-sm"
+                                    data-id="{{ $childLabelId }}"
+                                    data-en="{{ $childLabelEn }}">{{ __($child->name) }}</span>
 
                                 @if($childBadge > 0)
                                 <span class="inline-flex items-center justify-center bg-red-600 text-white text-[9px] font-bold px-1.5 min-w-[16px] h-[16px] rounded-full">
@@ -282,7 +297,6 @@
                     </div>
                     @endforeach
 
-                    <!-- Halaman Utama -->
 
                 </nav>
             </div>
@@ -319,26 +333,26 @@
 
                     @php
                     $quotes = [
-                    "Stay positive, work hard, make it happen.",
-                    "Every day is a new beginning.",
-                    "Push yourself, because no one else is going to do it for you.",
-                    "Success is not for the lazy.",
-                    "Keep going, you're getting there.",
-                    "Don't stop until you're proud.",
-                    "Be stronger than your excuses.",
-                    "Believe in yourself and all that you are.",
-                    "Your only limit is your mind.",
-                    "Do something today that your future self will thank you for.",
-                    "Progress, not perfection.",
-                    "Great things never come from comfort zones.",
-                    "Dream big. Work hard. Stay focused.",
-                    "Small steps every day.",
-                    "Discipline is doing it even when you don’t feel like it.",
-                    "Make each day your masterpiece.",
-                    "Success doesn’t come to you. You go to it.",
-                    "If not now, when?",
-                    "Work in silence, let success make the noise.",
-                    "Wake up with determination, go to bed with satisfaction.",
+                    ['id' => 'Tetap positif, bekerja keras, wujudkan.', 'en' => 'Stay positive, work hard, make it happen.'],
+                    ['id' => 'Setiap hari adalah awal yang baru.', 'en' => 'Every day is a new beginning.'],
+                    ['id' => 'Dorong dirimu, karena tidak ada orang lain yang akan melakukannya untukmu.', 'en' => 'Push yourself, because no one else is going to do it for you.'],
+                    ['id' => 'Kesuksesan bukan untuk yang malas.', 'en' => 'Success is not for the lazy.'],
+                    ['id' => 'Terus maju, kamu hampir sampai.', 'en' => "Keep going, you're getting there."],
+                    ['id' => 'Jangan berhenti sampai kamu bangga.', 'en' => "Don't stop until you're proud."],
+                    ['id' => 'Jadilah lebih kuat dari alasanmu.', 'en' => 'Be stronger than your excuses.'],
+                    ['id' => 'Percayalah pada dirimu dan semua yang ada padamu.', 'en' => 'Believe in yourself and all that you are.'],
+                    ['id' => 'Satu-satunya batasmu adalah pikiranmu.', 'en' => 'Your only limit is your mind.'],
+                    ['id' => 'Lakukan sesuatu hari ini yang akan disyukuri dirimu di masa depan.', 'en' => 'Do something today that your future self will thank you for.'],
+                    ['id' => 'Kemajuan, bukan kesempurnaan.', 'en' => 'Progress, not perfection.'],
+                    ['id' => 'Hal-hal besar tidak lahir dari zona nyaman.', 'en' => 'Great things never come from comfort zones.'],
+                    ['id' => 'Bermimpi besar. Bekerja keras. Tetap fokus.', 'en' => 'Dream big. Work hard. Stay focused.'],
+                    ['id' => 'Langkah kecil setiap hari.', 'en' => 'Small steps every day.'],
+                    ['id' => 'Disiplin adalah tetap melakukannya meski sedang tidak ingin.', 'en' => "Discipline is doing it even when you don't feel like it."],
+                    ['id' => 'Jadikan setiap hari mahakaryamu.', 'en' => 'Make each day your masterpiece.'],
+                    ['id' => 'Kesuksesan tidak datang padamu, kamulah yang menjemputnya.', 'en' => "Success doesn't come to you. You go to it."],
+                    ['id' => 'Kalau bukan sekarang, kapan lagi?', 'en' => 'If not now, when?'],
+                    ['id' => 'Bekerjalah dalam diam, biarkan kesuksesan yang membuat kebisingan.', 'en' => 'Work in silence, let success make the noise.'],
+                    ['id' => 'Bangun dengan tekad, tidur dengan kepuasan.', 'en' => 'Wake up with determination, go to bed with satisfaction.'],
                     ];
 
                     $dayOfYear = date('z'); // 0 - 365
@@ -348,94 +362,66 @@
                     srand();
                     @endphp
                     <!-- LEFT: Welcome + Quote -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 md:gap-4 min-w-0">
                         @php
-                        $photo = Auth::user()->employee?->applicant?->appPhoto;
-                        $path = public_path('appPhoto/' . $photo);
+
+
+                        $photoBaseUrl = 'http://10.1.4.100/interbat';
+
+                        $employeePhoto = Auth::user()->employee?->photo_path;
+                        $applicantPhoto = Auth::user()->employee?->applicant?->appPhoto;
+
+                        if ($employeePhoto) {
+                        $photoUrl = $photoBaseUrl . '/storage/' . $employeePhoto;
+                        } elseif ($applicantPhoto) {
+                        $photoUrl = $photoBaseUrl . '/' . $applicantPhoto;
+                        } else {
+                        $photoUrl = asset('images/default-avatar.png'); // default avatar tetap ambil dari project training
+                        }
                         @endphp
-
-                        <div class="relative group">
-
-                            <div
-                                class="
-                                absolute
-                                inset-0
-
-                                rounded-2xl
-
-                                bg-gradient-to-br
-                                from-indigo-500/20
-                                via-cyan-500/20
-                                to-purple-500/20
-
-                                blur-xl
-                                scale-110
-
-                                opacity-0
-                                group-hover:opacity-100
-
-                                transition-all
-                                duration-500">
+                        <div class="relative group shrink-0">
+                            <div class="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-500/20 via-cyan-500/20 to-purple-500/20 blur-xl scale-110 opacity-0 group-hover:opacity-100 transition-all duration-500">
                             </div>
 
-                            <img
-                                src="{{ Auth::user()->employee?->applicant?->appPhoto
-                                    ? env('APP_URL') . 'interbat/' . Auth::user()->employee->applicant->appPhoto
-                                    : env('APP_URL') . '/images/default-avatar.png'
+                            <img src="{{  $photoUrl
                                 }}"
                                 alt="Avatar"
-                                class="
-                                relative
+                                style="object-position: top; /* Fokus ke area atas dimana wajah biasanya berada */"
+                                class="relative w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl object-cover ring-2 md:ring-4 bg-white ring-white dark:ring-slate-800 shadow-md md:shadow-xl">
 
-                                w-14 h-14
-                                rounded-2xl
-                                object-cover
-
-                                ring-4
-                                ring-white
-                                dark:ring-slate-800
-
-                                shadow-xl">
-
-                            <span
-                                class="
-                                absolute
-                                bottom-0
-                                right-0
-
-                                w-4 h-4
-                                rounded-full
-
-                                bg-emerald-500
-                                border-2
-                                border-white
-                                dark:border-slate-900
-                                animate-pulse">
+                            <span class="absolute bottom-0 right-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 animate-pulse">
                             </span>
-
                         </div>
 
-                        <div>
+                        <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <h2 class="font-bold text-slate-900 dark:text-white">
-                                    Welcome, {{ Auth::user()->name }} 👋
+                                <h2 class="font-bold text-sm md:text-base text-slate-900 dark:text-white truncate">
+                                    <span data-id="Selamat datang," data-en="Welcome,">Welcome,</span>
+                                    {{ Auth::user()->name }} 👋
                                 </h2>
 
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium
-                        bg-emerald-100 text-emerald-700
-                        dark:bg-emerald-500/20 dark:text-emerald-400">
+                                <span class="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                                    data-id="Online" data-en="Online">
                                     Online
                                 </span>
                             </div>
 
-                            <p class="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xl">
-                                {{ $quoteToday }}
+                            <p class="hidden sm:block text-xs md:text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs md:max-w-xl"
+                                data-id="{{ $quoteToday['id'] }}" data-en="{{ $quoteToday['en'] }}">
+                                {{ $quoteToday['en'] }}
                             </p>
                         </div>
                     </div>
                     <!-- Right Side: User Profile & Dropdown -->
                     {{-- RIGHT --}}
                     <div class="flex items-center gap-4">
+
+                        {{-- Language Toggle --}}
+                        <button type="button" id="lang-toggle"
+                            class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                            aria-label="Toggle Language">
+                            🌐 <span id="current-lang-text">ID</span>
+                        </button>
 
                         {{-- Clock --}}
                         <div class="hidden md:flex flex-col text-right">
@@ -489,17 +475,18 @@
                                 border border-slate-200 dark:border-slate-700
                                 overflow-hidden">
 
-                                <div class="p-5 border-b border-slate-200 dark:border-slate-700">
+                                <div class="p-4 md:p-5 border-b border-slate-200 dark:border-slate-700">
 
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
 
                                         <img
-                                            src="{{ $photo
-        ? env('APP_URL') . '/interbat/' . $photo
-        : env('APP_URL') . '/images/default-avatar.png'
-    }}"
+                                            src="{{ $photoUrl
+                                                ? $photoUrl
+                                                : env('APP_URL') . '/images/default-avatar.png'
+                                            }}"
                                             alt="Avatar"
-                                            class="w-12 h-12 rounded-xl object-cover" />
+                                            style="object-position: top;"
+                                            class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl object-cover shrink-0" />
                                         <div>
                                             <h4 class="font-semibold text-slate-900 dark:text-white">
                                                 {{ Auth::user()->name }}
@@ -517,7 +504,7 @@
                                 <a href="{{ route('profile.edit') }}"
                                     class="flex items-center gap-3 px-5 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
                                     🔐
-                                    <span>Ganti Password</span>
+                                    <span data-id="Ganti Password" data-en="Change Password">Ganti Password</span>
                                 </a>
 
                                 <form method="POST" action="{{ route('logout') }}">
@@ -528,7 +515,7 @@
                             hover:bg-red-50 dark:hover:bg-red-900/20
                             text-red-600 transition">
                                         🚪
-                                        <span>Logout</span>
+                                        <span data-id="Keluar" data-en="Logout">Logout</span>
                                     </button>
                                 </form>
 
@@ -576,8 +563,9 @@
                                 •
                             </span>
 
-                            <span class="text-slate-500 dark:text-slate-400">
-                                Human Resource Information System
+                            <span class="text-slate-500 dark:text-slate-400"
+                                data-id="Sistem Pelatihan" data-en="Training System">
+                                Training System
                             </span>
 
                         </div>
@@ -610,7 +598,8 @@
                     text-xs
                     font-medium
                     text-emerald-700
-                    dark:text-emerald-400">
+                    dark:text-emerald-400"
+                                data-id="Sistem Aktif" data-en="System Online">
 
                                 System Online
 
@@ -673,7 +662,7 @@
 
 
     <!-- Flowise embed (tetap) -->
-    <script type="module">
+    <!-- <script type="module">
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
         Chatbot.init({
             chatflowid: "926a4038-c109-45f5-88c0-975c67c9963e",
@@ -787,7 +776,12 @@
                 },
             },
         });
-    </script>
+    </script> -->
+
+    <!-- Chat Widget Component -->
+    @auth
+    @include('components.chat-widget')
+    @endauth
 
     <!-- ClockPicker JS -->
     <script src="{{ env('APP_URL') }}/assets/js/bootstrap-clockpicker.min.js"></script>
@@ -805,8 +799,7 @@
     <!-- Flatpickr -->
     <script src="{{ env('APP_URL') }}/assets/js/flatpickr.min.js"></script>
     <script src="{{ env('APP_URL') }}/assets/js/monthSelect.min.js"></script>
-    <!-- Flatpickr MonthSelect Plugin (belum ada file lokal — tetap CDN) -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script> -->
+
 
     <!-- Summernote -->
     <script src="{{ env('APP_URL') }}/assets/js/summernote-lite.min.js"></script>
@@ -935,9 +928,10 @@
     <script>
         function updateClock() {
             const now = new Date();
+            const locale = (window.appLang === 'en') ? 'en-US' : 'id-ID';
 
             document.getElementById('liveClock').innerHTML =
-                now.toLocaleTimeString('id-ID', {
+                now.toLocaleTimeString(locale, {
                     hour: '2-digit',
                     minute: '2-digit',
                     second: '2-digit'
@@ -946,6 +940,69 @@
 
         updateClock();
         setInterval(updateClock, 1000);
+    </script>
+
+    <!-- Language toggle (localStorage: app_lang) -->
+    <script>
+        (function() {
+            const DEFAULT_LANG = 'id';
+
+            function getStoredLang() {
+                try {
+                    const l = localStorage.getItem('app_lang');
+                    return (l === 'id' || l === 'en') ? l : DEFAULT_LANG;
+                } catch (e) {
+                    return DEFAULT_LANG;
+                }
+            }
+
+            window.applyLanguage = function(lang) {
+                if (lang !== 'id' && lang !== 'en') lang = DEFAULT_LANG;
+                window.appLang = lang;
+
+                try {
+                    localStorage.setItem('app_lang', lang);
+                } catch (e) {}
+
+                document.documentElement.lang = lang;
+
+                // Teks
+                document.querySelectorAll('[data-id][data-en]').forEach(el => {
+                    el.textContent = el.getAttribute('data-' + lang);
+                });
+
+                // Placeholder
+                document.querySelectorAll('[data-id-placeholder]').forEach(el => {
+                    el.placeholder = el.getAttribute('data-' + lang + '-placeholder');
+                });
+
+                // Atribut title (tooltip)
+                document.querySelectorAll('[data-id-title]').forEach(el => {
+                    el.title = el.getAttribute('data-' + lang + '-title');
+                });
+
+                const label = document.getElementById('current-lang-text');
+                if (label) label.textContent = lang.toUpperCase();
+
+                if (typeof updateClock === 'function') updateClock();
+            };
+
+            // Terapkan saat halaman dibuka
+            window.applyLanguage(getStoredLang());
+
+            // Tombol toggle
+            const btn = document.getElementById('lang-toggle');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    window.applyLanguage(window.appLang === 'id' ? 'en' : 'id');
+                });
+            }
+
+            // Sinkron kalau bahasa diganti di tab lain
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'app_lang') window.applyLanguage(getStoredLang());
+            });
+        })();
     </script>
 
 </body>
