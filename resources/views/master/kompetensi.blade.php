@@ -6,7 +6,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h2 class="text-2xl font-extrabold mb-5 text-blue-500 flex items-center space-x-2 drop-shadow-sm">
                         <i class="fas fa-database text-blue-600 animate-pulse"></i>
-                        <span>Master Kompetensi</span>
+                        <span data-id="Master Kompetensi" data-en="Competency Master">Master Kompetensi</span>
 
                     </h2>
 
@@ -23,7 +23,7 @@
                             <button
                                 id="btnCreate"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
-                                <i class="fas fa-plus"></i> Create
+                                <i class="fas fa-plus"></i> <span data-id="Buat" data-en="Create">Buat</span>
                             </button>
                             @endcan
                         </div>
@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <!-- Modal Create Position -->
+    <!-- Modal Create Kompetensi -->
     <div
         id="modalCreate"
         class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 dark:bg-gray-900/90">
@@ -48,14 +48,14 @@
                 @csrf
 
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    📂 Tambah Master Kompetensi
+                    📂 <span data-id="Tambah Master Kompetensi" data-en="Add Competency Master">Tambah Master Kompetensi</span>
                 </h2>
 
 
-                <!-- Nama kategori -->
+                <!-- Nama kompetensi -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kompetensi <span class="text-red-500">*</span>
+                        <span data-id="Nama Kompetensi" data-en="Competency Name">Nama Kompetensi</span> <span class="text-red-500">*</span>
                     </label>
 
 
@@ -64,12 +64,14 @@
                         type="text"
                         required
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
-                        placeholder="Contoh: Leadership">
+                        placeholder="Contoh: Leadership"
+                        data-id-placeholder="Contoh: Leadership"
+                        data-en-placeholder="Example: Leadership">
                 </div>
                 <!-- Initial -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Initial <span class="text-red-500">*</span>
+                        <span data-id="Initial" data-en="Initial">Initial</span> <span class="text-red-500">*</span>
                     </label>
 
                     <input
@@ -78,26 +80,30 @@
                         required
                         maxlength="10"
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
-                        placeholder="Contoh: LD">
+                        placeholder="Contoh: LD"
+                        data-id-placeholder="Contoh: LD"
+                        data-en-placeholder="Example: LD">
                 </div>
 
                 <!-- Deskripsi -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Deskripsi
+                        <span data-id="Deskripsi" data-en="Description">Deskripsi</span>
                     </label>
 
                     <textarea
                         name="deskripsi"
                         rows="3"
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
-                        placeholder="Deskripsi kompetensi..."></textarea>
+                        placeholder="Deskripsi kompetensi..."
+                        data-id-placeholder="Deskripsi kompetensi..."
+                        data-en-placeholder="Competency description..."></textarea>
                 </div>
 
                 <!-- Kategori -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Kategori <span class="text-red-500">*</span>
+                        <span data-id="Kategori" data-en="Category">Kategori</span> <span class="text-red-500">*</span>
                     </label>
 
                     <select name="kategori_id" id="kategori_id"
@@ -112,13 +118,13 @@
                         type="button"
                         onclick="document.getElementById('modalCreate').classList.add('hidden')"
                         class="text-gray-600 hover:text-gray-900 dark:text-gray-300">
-                        ❌ Batal
+                        ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                     </button>
 
                     <button
                         type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md">
-                        💾 Simpan
+                        💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                     </button>
 
                 </div>
@@ -128,7 +134,7 @@
     </div>
 
 
-    <!-- Modal Edit Position -->
+    <!-- Modal Edit Kompetensi -->
     <div
         id="modalEdit"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-blue-950/60 backdrop-blur-sm p-4">
@@ -142,13 +148,13 @@
                 <input type="hidden" id="edit_id">
 
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    ✏️ Edit Master Kompetensi
+                    ✏️ <span data-id="Edit Master Kompetensi" data-en="Edit Competency Master">Edit Master Kompetensi</span>
                 </h2>
 
 
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kompetensi
+                        <span data-id="Nama Kompetensi" data-en="Competency Name">Nama Kompetensi</span>
                         <span class="text-red-500">*</span>
                     </label>
 
@@ -162,7 +168,7 @@
                 <!-- Initial -->
                 <div class="mt-4">
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Initial <span class="text-red-500">*</span>
+                        <span data-id="Initial" data-en="Initial">Initial</span> <span class="text-red-500">*</span>
                     </label>
 
                     <input
@@ -177,7 +183,7 @@
                 <!-- Deskripsi -->
                 <div class="mt-4">
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Deskripsi
+                        <span data-id="Deskripsi" data-en="Description">Deskripsi</span>
                     </label>
 
                     <textarea
@@ -190,7 +196,7 @@
                 <!-- Kategori -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Kategori <span class="text-red-500">*</span>
+                        <span data-id="Kategori" data-en="Category">Kategori</span> <span class="text-red-500">*</span>
                     </label>
 
                     <select name="kategori_id" id="edit_kategori_id" class="w-full" required></select>
@@ -200,12 +206,12 @@
                     <button type="button"
                         onclick="document.getElementById('modalEdit').classList.add('hidden')"
                         class="text-gray-600">
-                        ❌ Batal
+                        ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                     </button>
 
                     <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                        💾 Simpan
+                        💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                     </button>
                 </div>
 
@@ -219,7 +225,7 @@
         <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl">
 
             <h2 class="text-xl font-semibold mb-4">
-                ⚙️ Proses Skala Kompetensi
+                ⚙️ <span data-id="Proses Skala Kompetensi" data-en="Competency Scale Process">Proses Skala Kompetensi</span>
             </h2>
 
             <input type="hidden" id="proses_kompetensi_id">
@@ -228,18 +234,18 @@
 
             <button id="btnAddRow"
                 class="mt-3 bg-blue-500 text-white px-4 py-2 rounded">
-                ➕ Tambah Skala
+                ➕ <span data-id="Tambah Skala" data-en="Add Scale">Tambah Skala</span>
             </button>
 
             <div class="flex justify-end gap-3 mt-6">
                 <button onclick="$('#modalProses').addClass('hidden')"
                     class="text-gray-600">
-                    ❌ Batal
+                    ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                 </button>
 
                 <button id="btnSaveDetail"
                     class="bg-green-600 text-white px-6 py-2 rounded">
-                    💾 Simpan
+                    💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                 </button>
             </div>
 
@@ -263,7 +269,79 @@
         });
     </script>
     <script>
+        // ===== Helper terjemahan (mengikuti bahasa di localStorage 'app_lang') =====
+        function t(id, en) {
+            let lang = window.appLang;
+            if (!lang) {
+                try {
+                    lang = localStorage.getItem('app_lang');
+                } catch (e) {}
+            }
+            return lang === 'en' ? en : id;
+        }
+
+        // ===== Select2 kategori (dibuat ulang saat bahasa berganti supaya placeholder ikut berganti) =====
+        function initKategoriSelects() {
+            const configs = [{
+                    el: '#kategori_id',
+                    parent: '#modalCreate'
+                },
+                {
+                    el: '#edit_kategori_id',
+                    parent: '#modalEdit'
+                }
+            ];
+
+            configs.forEach(cfg => {
+                const $el = $(cfg.el);
+
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.select2('destroy');
+                }
+
+                $el.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: t('Pilih kategori...', 'Select category...'),
+                    language: {
+                        noResults: () => t('Data tidak ditemukan', 'No results found'),
+                        searching: () => t('Mencari...', 'Searching...')
+                    },
+                    dropdownParent: $(cfg.parent), // biar muncul di dalam modal
+                    ajax: {
+                        url: 'kategori-select/select', // endpoint
+                        type: 'GET',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                search: params.term // keyword
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.nama
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            });
+        }
+
         $(document).ready(function() {
+
+            // Saat bahasa diganti lewat tombol 🌐, bangun ulang grid & select2 supaya teks ikut berganti
+            if (typeof window.applyLanguage === 'function') {
+                const originalApplyLanguage = window.applyLanguage;
+                window.applyLanguage = function(lang) {
+                    originalApplyLanguage(lang);
+                    initKategoriSelects();
+                    if ($('#grid').length && typeof loadTable === 'function') loadTable();
+                };
+            }
 
             $.ajaxSetup({
                 headers: {
@@ -278,55 +356,8 @@
                 $('#modalCreate').addClass('hidden').removeClass('flex');
                 $('#formCreate')[0].reset();
             });
-            $('#kategori_id').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Pilih kategori...',
-                dropdownParent: $('#modalCreate'), // biar muncul di dalam modal
-                ajax: {
-                    url: 'kategori-select/select', // endpoint
-                    type: 'GET',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            search: params.term // keyword
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.map(item => ({
-                                id: item.id,
-                                text: item.nama
-                            }))
-                        };
-                    },
-                    cache: true
-                }
-            });
 
-            $('#edit_kategori_id').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Pilih kategori...',
-                dropdownParent: $('#modalEdit'),
-                ajax: {
-                    url: 'kategori-select/select',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            search: params.term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.map(item => ({
-                                id: item.id,
-                                text: item.nama
-                            }))
-                        };
-                    }
-                }
-            });
+            initKategoriSelects();
 
             loadTable();
         });
@@ -340,13 +371,13 @@
 
                     <input type="number"
                         name="skala[]"
-                        placeholder="Skala"
+                        placeholder="${t('Skala', 'Scale')}"
                         class="w-24 border rounded p-2"
                         value="${data.skala ?? ''}" />
 
                     <input type="text"
                         name="deskripsi[]"
-                        placeholder="Pengertian"
+                        placeholder="${t('Pengertian', 'Definition')}"
                         class="flex-1 border rounded p-2"
                         value="${data.deskripsi ?? ''}" />
 
@@ -407,7 +438,7 @@
                 },
                 success: function(res) {
 
-                    Swal.fire('Berhasil', res.message, 'success');
+                    Swal.fire(t('Berhasil', 'Success'), res.message, 'success');
                     $('#modalProses').addClass('hidden');
                 }
             });
@@ -439,9 +470,12 @@
                         columnAutoWidth: true,
                         columnHidingEnabled: true,
                         wordWrapEnabled: true,
+                        noDataText: t('Tidak ada data', 'No data'),
+
                         searchPanel: {
                             visible: true,
-                            width: 240
+                            width: 240,
+                            placeholder: t('Cari...', 'Search...')
                         },
 
                         paging: {
@@ -451,7 +485,8 @@
                         pager: {
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
-                            showInfo: true
+                            showInfo: true,
+                            infoText: t('Halaman {0} dari {1} ({2} data)', 'Page {0} of {1} ({2} items)')
                         },
 
                         onCellPrepared(e) {
@@ -469,7 +504,7 @@
                         },
 
                         columns: [{
-                                caption: 'No',
+                                caption: t('No', 'No'),
                                 width: 50,
                                 alignment: 'center',
                                 cellTemplate(container, options) {
@@ -483,23 +518,23 @@
                             },
                             {
                                 dataField: 'nama',
-                                caption: 'Nama Kompetensi', // ✅ ganti label
+                                caption: t('Nama Kompetensi', 'Competency Name'), // ✅ ganti label
                                 alignment: 'left'
                             },
                             {
                                 dataField: 'initial',
-                                caption: 'Initial',
+                                caption: t('Initial', 'Initial'),
                                 alignment: 'center',
                                 width: 120
                             },
                             {
                                 dataField: 'deskripsi',
-                                caption: 'Deskripsi',
+                                caption: t('Deskripsi', 'Description'),
                                 alignment: 'left'
                             },
                             {
                                 dataField: 'kategori.nama', // 🔥 ambil dari relasi
-                                caption: 'Kategori',
+                                caption: t('Kategori', 'Category'),
                                 alignment: 'center',
                                 width: 180,
                                 cellTemplate(container, options) {
@@ -515,7 +550,7 @@
                                 }
                             },
                             {
-                                caption: 'Actions',
+                                caption: t('Aksi', 'Actions'),
                                 alignment: 'center',
                                 width: 150,
                                 cellTemplate(container, options) {
@@ -534,7 +569,7 @@
                                         $('<button>')
                                             .addClass('p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded me-2 transition duration-200')
                                             .html('<i class="fas fa-edit"></i>')
-                                            .attr('title', 'Edit')
+                                            .attr('title', t('Ubah', 'Edit'))
                                             .on('click', function() {
                                                 openEditModal(id);
                                             })
@@ -546,7 +581,7 @@
                                         $('<button>')
                                             .addClass('p-2 bg-green-600 hover:bg-green-700 text-white rounded me-2 transition duration-200')
                                             .html('<i class="fas fa-cogs"></i>')
-                                            .attr('title', 'Proses')
+                                            .attr('title', t('Proses', 'Process'))
                                             .on('click', function() {
                                                 openProsesModal(id);
                                             })
@@ -558,16 +593,16 @@
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 hover:bg-red-700 text-white rounded me-2 transition duration-200')
                                             .html('<i class="fas fa-trash"></i>')
-                                            .attr('title', 'Hapus')
+                                            .attr('title', t('Hapus', 'Delete'))
                                             .on('click', function() {
 
                                                 Swal.fire({
-                                                    title: 'Hapus kompetensi?',
-                                                    text: 'Data yang dihapus tidak dapat dikembalikan.',
+                                                    title: t('Hapus kompetensi?', 'Delete competency?'),
+                                                    text: t('Data yang dihapus tidak dapat dikembalikan.', 'Deleted data cannot be restored.'),
                                                     icon: 'warning',
                                                     showCancelButton: true,
-                                                    confirmButtonText: 'Ya, Hapus',
-                                                    cancelButtonText: 'Batal',
+                                                    confirmButtonText: t('Ya, Hapus', 'Yes, Delete'),
+                                                    cancelButtonText: t('Batal', 'Cancel'),
                                                     confirmButtonColor: '#dc2626'
                                                 }).then(result => {
 
@@ -580,11 +615,15 @@
                                                                 _token: $('meta[name="csrf-token"]').attr('content')
                                                             },
                                                             success(res) {
-                                                                Swal.fire('Berhasil', res.message, 'success');
+                                                                Swal.fire(t('Berhasil', 'Success'), res.message, 'success');
                                                                 loadTable();
                                                             },
                                                             error() {
-                                                                Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data.', 'error');
+                                                                Swal.fire(
+                                                                    t('Gagal', 'Failed'),
+                                                                    t('Terjadi kesalahan saat menghapus data.', 'An error occurred while deleting the data.'),
+                                                                    'error'
+                                                                );
                                                             }
                                                         });
 
@@ -625,7 +664,7 @@
                     // 🔥 SET SELECT2 VALUE
                     if (data.kategori_id) {
 
-                        let option = new Option(data.kategori?.nama ?? 'Kategori', data.kategori_id, true, true);
+                        let option = new Option(data.kategori?.nama ?? t('Kategori', 'Category'), data.kategori_id, true, true);
                         $('#edit_kategori_id').append(option).trigger('change');
 
                     } else {
@@ -638,8 +677,8 @@
                 error: function() {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: 'Gagal mengambil data kompetensi.'
+                        title: t('Gagal', 'Failed'),
+                        text: t('Gagal mengambil data kompetensi.', 'Failed to fetch competency data.')
                     });
                 }
             });
@@ -654,7 +693,7 @@
             const $btn = $form.find('button[type="submit"]');
             const originalText = $btn.html();
 
-            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...');
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> ' + t('Menyimpan...', 'Saving...'));
 
             $.ajax({
                 url: "{{ route('kompetensi.store') }}",
@@ -664,7 +703,7 @@
                 success: function(res) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Sukses!',
+                        title: t('Sukses!', 'Success!'),
                         text: res.message,
                     }).then(() => {
 
@@ -679,11 +718,11 @@
 
                 error: function(xhr) {
 
-                    let error = xhr.responseJSON?.message ?? 'Gagal menyimpan';
+                    let error = xhr.responseJSON?.message ?? t('Gagal menyimpan', 'Failed to save');
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal!',
+                        title: t('Gagal!', 'Failed!'),
                         text: error
                     });
                 },
@@ -710,7 +749,7 @@
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Sukses',
+                        title: t('Sukses', 'Success'),
                         text: res.message
                     });
 
@@ -723,8 +762,8 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: xhr.responseJSON?.message ?? 'Gagal update'
+                        title: t('Gagal', 'Failed'),
+                        text: xhr.responseJSON?.message ?? t('Gagal update', 'Failed to update')
                     });
 
                 }

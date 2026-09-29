@@ -6,7 +6,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h2 class="text-2xl font-extrabold mb-5 text-blue-500 flex items-center space-x-2 drop-shadow-sm">
                         <i class="fas fa-database text-blue-600 animate-pulse"></i>
-                        <span>Master Kompetensi Pelatihan</span>
+                        <span data-id="Master Kompetensi Pelatihan" data-en="Training Competency Master">Master Kompetensi Pelatihan</span>
 
                     </h2>
 
@@ -23,7 +23,7 @@
                             <button
                                 id="btnCreate"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
-                                <i class="fas fa-plus"></i> Create
+                                <i class="fas fa-plus"></i> <span data-id="Buat" data-en="Create">Buat</span>
                             </button>
                             @endcan
                             {{-- BUTTON IMPORT --}}
@@ -45,7 +45,7 @@
                                 <button type="button"
                                     onclick="document.getElementById('fileImport').click()"
                                     class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
-                                    <i class="fas fa-file-excel"></i> Import Excel
+                                    <i class="fas fa-file-excel"></i> <span data-id="Import Excel" data-en="Import Excel">Import Excel</span>
                                 </button>
                             </form>
                             @endcan
@@ -69,15 +69,17 @@
             </button>
 
             <div>
-                <label class="text-sm font-medium">Kategori</label>
+                <label class="text-sm font-medium" data-id="Kategori" data-en="Category">Kategori</label>
                 <select class="selectKategoriBlock w-full border rounded-lg p-2.5 mt-1"></select>
             </div>
 
             <div class="kompetensiWrapperBlock mt-4 hidden">
-                <label class="font-semibold text-gray-700 text-sm">Kompetensi &amp; Penilaian</label>
+                <label class="font-semibold text-gray-700 text-sm"
+                    data-id="Kompetensi &amp; Penilaian" data-en="Competency &amp; Assessment">Kompetensi &amp; Penilaian</label>
 
-                <div class="kompetensiLoadingBlock hidden text-sm text-gray-500 mt-2">
-                    Loading kompetensi...
+                <div class="kompetensiLoadingBlock hidden text-sm text-gray-500 mt-2"
+                    data-id="Memuat kompetensi..." data-en="Loading competencies...">
+                    Memuat kompetensi...
                 </div>
 
                 <div class="kompetensiListBlock space-y-3 mt-3"></div>
@@ -93,7 +95,7 @@
 
             <!-- HEADER (FIXED) -->
             <div class="px-4 sm:px-6 py-3 sm:py-4 border-b flex justify-between items-center shrink-0">
-                <h2 class="text-base sm:text-lg font-semibold">Tambah Kompetensi</h2>
+                <h2 class="text-base sm:text-lg font-semibold" data-id="Tambah Kompetensi" data-en="Add Competency">Tambah Kompetensi</h2>
                 <button onclick="$('#modalCreate').addClass('hidden')"
                     class="text-gray-400 hover:text-red-500 text-lg">
                     ✕
@@ -116,13 +118,13 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium">Jabatan</label>
+                            <label class="text-sm font-medium" data-id="Jabatan" data-en="Job Title">Jabatan</label>
                             <select id="selectJabatan" name="id_jabatan"
                                 class="w-full border rounded-lg p-2.5 mt-1"></select>
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium">Posisi</label>
+                            <label class="text-sm font-medium" data-id="Posisi" data-en="Position">Posisi</label>
                             <select id="selectPosisi" name="id_posisi"
                                 class="w-full border rounded-lg p-2.5 mt-1"></select>
                         </div>
@@ -138,10 +140,11 @@
                     <!-- KATEGORI (CLONEABLE) -->
                     <div class="mt-4">
                         <div class="flex items-center justify-between">
-                            <label class="font-semibold text-gray-700">Kategori &amp; Kompetensi</label>
+                            <label class="font-semibold text-gray-700"
+                                data-id="Kategori &amp; Kompetensi" data-en="Category &amp; Competency">Kategori &amp; Kompetensi</label>
                             <button type="button" id="btnAddKategoriCreate"
                                 class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-plus"></i> Tambah Kategori
+                                <i class="fas fa-plus"></i> <span data-id="Tambah Kategori" data-en="Add Category">Tambah Kategori</span>
                             </button>
                         </div>
 
@@ -155,12 +158,14 @@
             <div class="px-4 sm:px-6 py-4 border-t flex flex-col sm:flex-row justify-end gap-3 shrink-0 bg-white">
                 <button type="button"
                     onclick="$('#modalCreate').addClass('hidden')"
-                    class="w-full sm:w-auto border px-4 py-2 rounded-lg">
+                    class="w-full sm:w-auto border px-4 py-2 rounded-lg"
+                    data-id="Batal" data-en="Cancel">
                     Batal
                 </button>
 
                 <button type="submit" form="formCreate"
-                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg">
+                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg"
+                    data-id="Simpan" data-en="Save">
                     Simpan
                 </button>
             </div>
@@ -177,7 +182,7 @@
 
             <!-- HEADER -->
             <div class="px-4 sm:px-6 py-3 sm:py-4 border-b flex justify-between items-center shrink-0">
-                <h2 class="text-base sm:text-lg font-semibold">
+                <h2 class="text-base sm:text-lg font-semibold" data-id="Edit Kompetensi" data-en="Edit Competency">
                     Edit Kompetensi
                 </h2>
 
@@ -211,7 +216,7 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium">
+                            <label class="text-sm font-medium" data-id="Jabatan" data-en="Job Title">
                                 Jabatan
                             </label>
 
@@ -222,7 +227,7 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium">
+                            <label class="text-sm font-medium" data-id="Posisi" data-en="Position">
                                 Posisi
                             </label>
 
@@ -248,10 +253,11 @@
                     <!-- KATEGORI (CLONEABLE) -->
                     <div class="mt-4">
                         <div class="flex items-center justify-between">
-                            <label class="font-semibold text-gray-700">Kategori &amp; Kompetensi</label>
+                            <label class="font-semibold text-gray-700"
+                                data-id="Kategori &amp; Kompetensi" data-en="Category &amp; Competency">Kategori &amp; Kompetensi</label>
                             <button type="button" id="btnAddKategoriEdit"
                                 class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-plus"></i> Tambah Kategori
+                                <i class="fas fa-plus"></i> <span data-id="Tambah Kategori" data-en="Add Category">Tambah Kategori</span>
                             </button>
                         </div>
 
@@ -267,13 +273,15 @@
 
                 <button type="button"
                     onclick="$('#modalEdit').addClass('hidden')"
-                    class="w-full sm:w-auto border px-4 py-2 rounded-lg">
+                    class="w-full sm:w-auto border px-4 py-2 rounded-lg"
+                    data-id="Batal" data-en="Cancel">
                     Batal
                 </button>
 
                 <button type="submit"
                     form="formEdit"
-                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg">
+                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg"
+                    data-id="Update" data-en="Update">
                     Update
                 </button>
 
@@ -312,7 +320,192 @@
     </script>
 
     <script>
+        // ============================================================
+        // HELPER TERJEMAHAN (mengikuti bahasa di localStorage 'app_lang')
+        // ============================================================
+        function currentLang() {
+            let lang = window.appLang;
+            if (!lang) {
+                try {
+                    lang = localStorage.getItem('app_lang');
+                } catch (e) {}
+            }
+            return lang === 'en' ? 'en' : 'id';
+        }
+
+        function t(id, en) {
+            return currentLang() === 'en' ? en : id;
+        }
+
+        // Terjemahkan elemen [data-id][data-en] di dalam root tertentu
+        // (dipakai untuk isi <template> yang di-clone, karena tidak ikut diterjemahkan oleh applyLanguage saat halaman dibuka)
+        function translateEl($root) {
+            const lang = currentLang();
+            $root.find('[data-id][data-en]').each(function() {
+                this.textContent = this.getAttribute('data-' + lang);
+            });
+        }
+
+        // Teks bawaan Select2 (tidak ada hasil / mencari)
+        function select2Lang() {
+            return {
+                noResults: () => t('Data tidak ditemukan', 'No results found'),
+                searching: () => t('Mencari...', 'Searching...')
+            };
+        }
+
+        // ============================================================
+        // SELECT2 STATIS (department, jabatan, posisi, workunit) - create & edit
+        // Dibuat ulang saat bahasa berganti supaya placeholder ikut berganti
+        // ============================================================
+        function initStaticSelects() {
+
+            const resetSelect2 = $el => {
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.select2('destroy');
+                }
+            };
+
+            const departmentSelect = (selector, parent) => {
+                const $el = $(selector);
+                resetSelect2($el);
+
+                $el.select2({
+                    dropdownParent: $(parent),
+                    width: '100%',
+                    placeholder: t('-- Pilih Department --', '-- Select Department --'),
+                    language: select2Lang(),
+                    allowClear: true,
+                    ajax: {
+                        url: '{{ route("depart.select") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                search: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.depNama
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            };
+
+            const dropdownSelect = (selector, parent, placeholder, url) => {
+                const $el = $(selector);
+                resetSelect2($el);
+
+                $el.select2({
+                    dropdownParent: $(parent),
+                    placeholder: placeholder,
+                    language: select2Lang(),
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    ajax: {
+                        url: url,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                q: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data
+                            };
+                        }
+                    }
+                });
+            };
+
+            if (isSuperDepart) {
+                departmentSelect('#selectDepartment', '#modalCreate');
+                departmentSelect('#editDepartment', '#modalEdit');
+            }
+
+            // CREATE
+            dropdownSelect('#selectJabatan', '#modalCreate', t('Pilih Jabatan', 'Select Job Title'), 'dropdown/jabatan');
+            dropdownSelect('#selectPosisi', '#modalCreate', t('Pilih Posisi', 'Select Position'), 'dropdown/posisi');
+            dropdownSelect('#selectWorkunit', '#modalCreate', t('Pilih Workunit', 'Select Work Unit'), 'dropdown/workunit');
+
+            // EDIT
+            dropdownSelect('#editJabatan', '#modalEdit', t('Pilih Jabatan', 'Select Job Title'), 'dropdown/jabatan');
+            dropdownSelect('#editPosisi', '#modalEdit', t('Pilih Posisi', 'Select Position'), 'dropdown/posisi');
+            dropdownSelect('#editWorkunit', '#modalEdit', t('Pilih Workunit', 'Select Work Unit'), 'dropdown/workunit');
+        }
+
+        // ============================================================
+        // SELECT2 KATEGORI (per blok) - dibuat ulang saat bahasa berganti
+        // ============================================================
+        function initKategoriSelect($select, $container, $block, modalSelector) {
+
+            if ($select.hasClass('select2-hidden-accessible')) {
+                $select.select2('destroy');
+            }
+
+            $select.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $(modalSelector),
+                placeholder: t('Pilih kategori', 'Select category'),
+                language: select2Lang(),
+                ajax: {
+                    url: "{{ route('kategori.search') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({
+                        q: params.term
+                    }),
+                    processResults: (data) => {
+                        const usedIds = getUsedKategoriIds($container, $block);
+                        const filtered = data.filter(item => !usedIds.includes(String(item.id)));
+                        return {
+                            results: filtered
+                        };
+                    }
+                }
+            });
+        }
+
+        // Re-init semua select2 kategori yang sudah ada di kedua modal
+        function reinitAllKategoriSelects() {
+            [{
+                    container: '#kategoriBlockContainerCreate',
+                    modal: '#modalCreate'
+                },
+                {
+                    container: '#kategoriBlockContainerEdit',
+                    modal: '#modalEdit'
+                }
+            ].forEach(cfg => {
+                const $container = $(cfg.container);
+                $container.find('.kategori-block').each(function() {
+                    const $block = $(this);
+                    initKategoriSelect($block.find('.selectKategoriBlock'), $container, $block, cfg.modal);
+                });
+            });
+        }
+
         $(document).ready(function() {
+
+            // Saat bahasa diganti lewat tombol 🌐, bangun ulang grid & select2 supaya teks ikut berganti
+            if (typeof window.applyLanguage === 'function') {
+                const originalApplyLanguage = window.applyLanguage;
+                window.applyLanguage = function(lang) {
+                    originalApplyLanguage(lang);
+                    initStaticSelects();
+                    reinitAllKategoriSelects();
+                    if ($('#grid').length && typeof loadTable === 'function') loadTable(true);
+                };
+            }
 
             $.ajaxSetup({
                 headers: {
@@ -337,37 +530,17 @@
             });
 
             // ============================================================
-            // DEPARTMENT (khusus super depart) - CREATE
+            // DEPARTMENT (khusus super depart) - wrapper tampil
             // ============================================================
             if (isSuperDepart) {
                 $('#departmentWrapper').removeClass('hidden');
-
-                $('#selectDepartment').select2({
-                    dropdownParent: $('#modalCreate'),
-                    width: '100%',
-                    placeholder: '-- Pilih Department --',
-                    allowClear: true,
-                    ajax: {
-                        url: '{{ route("depart.select") }}',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                search: params.term
-                            };
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: data.map(item => ({
-                                    id: item.id,
-                                    text: item.depNama
-                                }))
-                            };
-                        },
-                        cache: true
-                    }
-                });
+                $('#editDepartmentWrapper').removeClass('hidden');
             }
+
+            // ============================================================
+            // SELECT2 STATIS (create & edit)
+            // ============================================================
+            initStaticSelects();
 
             $('#btnCreate').on('click', function() {
                 $('#modalCreate').removeClass('hidden').addClass('flex');
@@ -382,75 +555,6 @@
 
             loadTable();
 
-            // JABATAN (CREATE)
-            $('#selectJabatan').select2({
-                dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih Jabatan",
-                theme: "bootstrap-5",
-                width: '100%',
-                ajax: {
-                    url: 'dropdown/jabatan',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-            });
-
-            // POSISI (CREATE)
-            $('#selectPosisi').select2({
-                dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih Posisi",
-                theme: "bootstrap-5",
-                width: '100%',
-                ajax: {
-                    url: 'dropdown/posisi',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-            });
-
-            // WORKUNIT (CREATE)
-            $('#selectWorkunit').select2({
-                dropdownParent: $('#modalCreate'),
-                placeholder: "Pilih Workunit",
-                theme: "bootstrap-5",
-                width: '100%',
-                ajax: {
-                    url: 'dropdown/workunit',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-            });
-
             // kalau department berubah -> reload kompetensi di SEMUA blok kategori (create)
             $('#selectDepartment').on('change', function() {
                 const departmentId = $(this).val();
@@ -459,93 +563,6 @@
                     const kategoriId = $block.find('.selectKategoriBlock').val();
                     renderKompetensiForBlock($block, kategoriId, departmentId);
                 });
-            });
-
-            // ============================================================
-            // DEPARTMENT (khusus super depart) - EDIT
-            // ============================================================
-            if (isSuperDepart) {
-                $('#editDepartmentWrapper').removeClass('hidden');
-
-                $('#editDepartment').select2({
-                    dropdownParent: $('#modalEdit'),
-                    width: '100%',
-                    placeholder: '-- Pilih Department --',
-                    allowClear: true,
-                    ajax: {
-                        url: '{{ route("depart.select") }}',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                search: params.term
-                            };
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: data.map(item => ({
-                                    id: item.id,
-                                    text: item.depNama
-                                }))
-                            };
-                        },
-                        cache: true
-                    }
-                });
-            }
-
-            $('#editJabatan').select2({
-                dropdownParent: $('#modalEdit'),
-                width: '100%',
-                theme: 'bootstrap-5',
-                placeholder: 'Pilih Jabatan',
-                ajax: {
-                    url: 'dropdown/jabatan',
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
-            });
-
-            $('#editPosisi').select2({
-                dropdownParent: $('#modalEdit'),
-                width: '100%',
-                theme: 'bootstrap-5',
-                placeholder: 'Pilih Posisi',
-                ajax: {
-                    url: 'dropdown/posisi',
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
-            });
-
-            $('#editWorkunit').select2({
-                dropdownParent: $('#modalEdit'),
-                width: '100%',
-                theme: 'bootstrap-5',
-                placeholder: 'Pilih Workunit',
-                ajax: {
-                    url: 'dropdown/workunit',
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: data => ({
-                        results: data
-                    })
-                }
             });
 
             // kalau department berubah -> reload kompetensi di SEMUA blok kategori (edit)
@@ -594,6 +611,9 @@
 
             const $blockInDom = $container.children('.kategori-block').last();
 
+            // isi template yang di-clone perlu diterjemahkan manual sesuai bahasa aktif
+            translateEl($blockInDom);
+
             // beri id unik ke tiap blok kategori, supaya radio "nilai" antar blok
             // (dan antar kompetensi yang sama di blok berbeda) tidak saling bentrok
             const blockUid = 'blk' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -601,27 +621,7 @@
 
             const $selectKategori = $blockInDom.find('.selectKategoriBlock');
 
-            $selectKategori.select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $(modalSelector),
-                placeholder: 'Pilih kategori',
-                ajax: {
-                    url: "{{ route('kategori.search') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: params => ({
-                        q: params.term
-                    }),
-                    processResults: (data) => {
-                        const usedIds = getUsedKategoriIds($container, $blockInDom);
-                        const filtered = data.filter(item => !usedIds.includes(String(item.id)));
-                        return {
-                            results: filtered
-                        };
-                    }
-                }
-            });
+            initKategoriSelect($selectKategori, $container, $blockInDom, modalSelector);
 
             $blockInDom.find('.btnRemoveKategoriBlock').on('click', function() {
                 $blockInDom.remove();
@@ -636,8 +636,11 @@
                         if (usedIds.includes(String(kategoriId))) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Kategori sudah dipilih',
-                                text: 'Kategori ini sudah digunakan pada blok lain. Silakan pilih kategori yang berbeda.'
+                                title: t('Kategori sudah dipilih', 'Category already selected'),
+                                text: t(
+                                    'Kategori ini sudah digunakan pada blok lain. Silakan pilih kategori yang berbeda.',
+                                    'This category is already used in another block. Please choose a different category.'
+                                )
                             });
 
                             // reset pilihan yang barusan dipilih
@@ -673,6 +676,7 @@
         // RENDER LIST KOMPETENSI + NILAI UNTUK 1 BLOK KATEGORI
         // Ditampilkan sebagai kartu pilihan (radio card) full-text -- skala &
         // deskripsi lengkap langsung kelihatan, tidak terpotong / butuh hover.
+        // Teks statis diberi data-id / data-en supaya ikut berganti saat toggle bahasa.
         // ============================================================
         function renderKompetensiForBlock($block, kategoriId, departmentId, savedItems = []) {
 
@@ -722,8 +726,10 @@
 
                     if (!res.length) {
                         html = `
-                            <div class="text-sm text-gray-500 italic">
-                                Tidak ada kompetensi pada kategori ini
+                            <div class="text-sm text-gray-500 italic"
+                                data-id="Tidak ada kompetensi pada kategori ini"
+                                data-en="No competencies in this category">
+                                ${t('Tidak ada kompetensi pada kategori ini', 'No competencies in this category')}
                             </div>
                         `;
                     }
@@ -748,12 +754,11 @@
                 class="selectNilaiRadio mt-1 accent-gray-500"
                 ${isNoneChecked ? 'checked' : ''}>
             <span class="flex-1">
-                <span class="block text-sm font-semibold text-gray-600">
-                    Tidak Ada
-                </span>
-                <span class="block text-xs text-gray-400 leading-snug mt-0.5">
-                    Kompetensi ini tidak memerlukan penilaian skala
-                </span>
+                <span class="block text-sm font-semibold text-gray-600"
+                    data-id="Tidak Ada" data-en="None">${t('Tidak Ada', 'None')}</span>
+                <span class="block text-xs text-gray-400 leading-snug mt-0.5"
+                    data-id="Kompetensi ini tidak memerlukan penilaian skala"
+                    data-en="This competency does not require a scale rating">${t('Kompetensi ini tidak memerlukan penilaian skala', 'This competency does not require a scale rating')}</span>
             </span>
         </label>
     `;
@@ -773,9 +778,8 @@
                         class="selectNilaiRadio mt-1 accent-blue-600"
                         ${isChecked ? 'checked' : ''}>
                     <span class="flex-1">
-                        <span class="block text-sm font-semibold text-gray-800">
-                            Skala ${d.skala}
-                        </span>
+                        <span class="block text-sm font-semibold text-gray-800"
+                            data-id="Skala ${d.skala}" data-en="Scale ${d.skala}">${t('Skala', 'Scale')} ${d.skala}</span>
                         ${desc ? `<span class="block text-xs text-gray-500 leading-snug mt-0.5">${desc}</span>` : ''}
                     </span>
                 </label>
@@ -783,8 +787,10 @@
                             });
                         } else {
                             optionsHtml += `
-            <div class="text-xs text-gray-400 italic px-1 col-span-full">
-                Belum ada skala penilaian untuk kompetensi ini
+            <div class="text-xs text-gray-400 italic px-1 col-span-full"
+                data-id="Belum ada skala penilaian untuk kompetensi ini"
+                data-en="No rating scale available for this competency">
+                ${t('Belum ada skala penilaian untuk kompetensi ini', 'No rating scale available for this competency')}
             </div>
         `;
                         }
@@ -809,8 +815,10 @@
                 error: function() {
                     $loading.addClass('hidden');
                     $list.html(`
-                        <div class="text-red-500 text-sm">
-                            Gagal mengambil data kompetensi
+                        <div class="text-red-500 text-sm"
+                            data-id="Gagal mengambil data kompetensi"
+                            data-en="Failed to fetch competency data">
+                            ${t('Gagal mengambil data kompetensi', 'Failed to fetch competency data')}
                         </div>
                     `);
                 }
@@ -863,23 +871,26 @@
             if (!groups.length) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Lengkapi data',
-                    text: 'Minimal 1 kategori dengan kompetensi & nilai harus diisi.'
+                    title: t('Lengkapi data', 'Complete the data'),
+                    text: t(
+                        'Minimal 1 kategori dengan kompetensi & nilai harus diisi.',
+                        'At least 1 category with competencies & scores must be filled in.'
+                    )
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Simpan data?',
+                title: t('Simpan data?', 'Save data?'),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, simpan',
-                cancelButtonText: 'Batal'
+                confirmButtonText: t('Ya, simpan', 'Yes, save'),
+                cancelButtonText: t('Batal', 'Cancel')
             }).then((result) => {
                 if (!result.isConfirmed) return;
 
                 Swal.fire({
-                    title: 'Menyimpan...',
+                    title: t('Menyimpan...', 'Saving...'),
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
@@ -899,8 +910,8 @@
                     success: function(res) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message ?? 'Data berhasil disimpan',
+                            title: t('Berhasil', 'Success'),
+                            text: res.message ?? t('Data berhasil disimpan', 'Data saved successfully'),
                             timer: 1500,
                             showConfirmButton: false
                         });
@@ -921,7 +932,7 @@
                         }
                     },
                     error: function(xhr) {
-                        let msg = 'Gagal menyimpan';
+                        let msg = t('Gagal menyimpan', 'Failed to save');
 
                         if (xhr.responseJSON?.message) {
                             msg = xhr.responseJSON.message;
@@ -1013,8 +1024,8 @@
                 error: function() {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: 'Data tidak ditemukan'
+                        title: t('Gagal', 'Failed'),
+                        text: t('Data tidak ditemukan', 'Data not found')
                     });
                 }
             });
@@ -1031,23 +1042,26 @@
             if (!groups.length) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Lengkapi data',
-                    text: 'Minimal 1 kategori dengan kompetensi & nilai harus diisi.'
+                    title: t('Lengkapi data', 'Complete the data'),
+                    text: t(
+                        'Minimal 1 kategori dengan kompetensi & nilai harus diisi.',
+                        'At least 1 category with competencies & scores must be filled in.'
+                    )
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Update data?',
+                title: t('Update data?', 'Update data?'),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, update',
-                cancelButtonText: 'Batal'
+                confirmButtonText: t('Ya, update', 'Yes, update'),
+                cancelButtonText: t('Batal', 'Cancel')
             }).then((result) => {
                 if (!result.isConfirmed) return;
 
                 Swal.fire({
-                    title: 'Menyimpan...',
+                    title: t('Menyimpan...', 'Saving...'),
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
@@ -1068,8 +1082,8 @@
                     success: function(res) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message ?? 'Data berhasil diupdate',
+                            title: t('Berhasil', 'Success'),
+                            text: res.message ?? t('Data berhasil diupdate', 'Data updated successfully'),
                             timer: 1500,
                             showConfirmButton: false
                         });
@@ -1080,7 +1094,7 @@
                         loadTable();
                     },
                     error: function(xhr) {
-                        let msg = 'Gagal update data';
+                        let msg = t('Gagal update data', 'Failed to update data');
 
                         if (xhr.responseJSON?.message) {
                             msg = xhr.responseJSON.message;
@@ -1092,7 +1106,7 @@
 
                         Swal.fire({
                             icon: 'error',
-                            title: 'Gagal',
+                            title: t('Gagal', 'Failed'),
                             text: msg
                         });
                     }
@@ -1101,11 +1115,13 @@
         });
 
         // ============================================================
-        // GRID (DevExtreme) - tidak berubah dari sebelumnya
+        // GRID (DevExtreme)
+        // loadTable(true) = bangun ulang grid (dipakai saat bahasa berganti)
+        // loadTable()     = cukup update data, state grid (grouping, dll) tetap
         // ============================================================
         let gridInstance = null;
 
-        function loadTable() {
+        function loadTable(rebuild = false) {
             const gridId = 'grid';
             const $container = $('#' + gridId);
 
@@ -1114,6 +1130,12 @@
                 .then(data => {
                     const rows = data.data;
                     const userPermissions = data.permissions || {};
+
+                    if (gridInstance && rebuild) {
+                        $container.dxDataGrid('dispose');
+                        $container.empty();
+                        gridInstance = null;
+                    }
 
                     if (gridInstance) {
                         gridInstance.option('dataSource', rows);
@@ -1126,10 +1148,14 @@
                         rowAlternationEnabled: true,
                         columnAutoWidth: true,
                         showBorders: true,
+                        noDataText: t('Tidak ada data', 'No data'),
 
                         groupPanel: {
                             visible: true,
-                            emptyPanelText: "Drag a column header here to group by that column"
+                            emptyPanelText: t(
+                                'Tarik header kolom ke sini untuk mengelompokkan',
+                                'Drag a column header here to group by that column'
+                            )
                         },
                         grouping: {
                             autoExpandAll: true
@@ -1139,11 +1165,13 @@
                         columnChooser: {
                             enabled: true,
                             mode: "select",
-                            allowSearch: true
+                            allowSearch: true,
+                            title: t('Pemilih Kolom', 'Column Chooser')
                         },
                         searchPanel: {
                             visible: true,
-                            width: 240
+                            width: 240,
+                            placeholder: t('Cari...', 'Search...')
                         },
                         paging: {
                             pageSize: 10
@@ -1151,7 +1179,8 @@
                         pager: {
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
-                            showInfo: true
+                            showInfo: true,
+                            infoText: t('Halaman {0} dari {1} ({2} data)', 'Page {0} of {1} ({2} items)')
                         },
 
                         columnHidingEnabled: false,
@@ -1169,7 +1198,7 @@
                         },
 
                         columns: [{
-                                caption: 'No',
+                                caption: t('No', 'No'),
                                 width: 60,
                                 alignment: 'center',
                                 allowGrouping: false,
@@ -1193,50 +1222,50 @@
                             },
 
                             {
-                                caption: 'Kategori',
+                                caption: t('Kategori', 'Category'),
                                 dataField: 'kategori.nama',
                                 calculateCellValue: row => row.kategori?.nama ?? '-',
                                 groupIndex: 0
                             },
 
                             {
-                                caption: 'Departement',
+                                caption: t('Departement', 'Department'),
                                 dataField: 'departement.depNama',
                                 calculateCellValue: row => row.departement?.depNama ?? '-',
                                 groupIndex: 1
                             },
 
                             {
-                                caption: 'Kompetensi',
+                                caption: t('Kompetensi', 'Competency'),
                                 dataField: 'kompetensi.nama',
                                 calculateCellValue: row => row.kompetensi?.nama ?? '-'
                             },
 
                             {
-                                caption: 'Jabatan',
+                                caption: t('Jabatan', 'Job Title'),
                                 dataField: 'peran.nama',
                                 calculateCellValue: row => row.posisi?.posiNama ?? '-'
                             },
                             {
-                                caption: 'Posisi',
+                                caption: t('Posisi', 'Position'),
                                 dataField: 'posisi.nama',
                                 calculateCellValue: row => row.peran?.name ?? '-'
                             },
                             {
-                                caption: 'Workunit',
+                                caption: t('Workunit', 'Work Unit'),
                                 dataField: 'workunit.nama',
                                 calculateCellValue: row => row.workunit?.woruNama ?? '-'
                             },
 
                             {
-                                caption: 'Nilai',
+                                caption: t('Nilai', 'Score'),
                                 dataField: 'nilai',
                                 alignment: 'center',
                                 width: 100
                             },
 
                             {
-                                caption: 'Actions',
+                                caption: t('Aksi', 'Actions'),
                                 alignment: 'center',
                                 width: 120,
                                 allowGrouping: false,
@@ -1248,7 +1277,7 @@
                                     if (userPermissions.edit) {
                                         $('<button>')
                                             .addClass('p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition')
-                                            .attr('title', 'Edit')
+                                            .attr('title', t('Ubah', 'Edit'))
                                             .html('<i class="fas fa-edit"></i>')
                                             .on('click', e => {
                                                 e.stopPropagation();
@@ -1259,7 +1288,7 @@
                                     if (userPermissions.edit) {
                                         $('<button>')
                                             .addClass('p-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition')
-                                            .attr('title', 'Clone')
+                                            .attr('title', t('Duplikat', 'Clone'))
                                             .html('<i class="fas fa-copy"></i>')
                                             .on('click', e => {
                                                 e.stopPropagation();
@@ -1270,7 +1299,7 @@
                                     if (userPermissions.delete) {
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded hover:bg-red-700 transition')
-                                            .attr('title', 'Delete')
+                                            .attr('title', t('Hapus', 'Delete'))
                                             .html('<i class="fas fa-trash"></i>')
                                             .on('click', e => {
                                                 e.stopPropagation();
@@ -1354,8 +1383,8 @@
                 error: function() {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: 'Data tidak ditemukan'
+                        title: t('Gagal', 'Failed'),
+                        text: t('Data tidak ditemukan', 'Data not found')
                     });
                 }
             });
@@ -1364,12 +1393,12 @@
         function deleteData(id) {
 
             return Swal.fire({
-                title: 'Hapus data?',
-                text: 'Data yang sudah dihapus tidak bisa dikembalikan.',
+                title: t('Hapus data?', 'Delete data?'),
+                text: t('Data yang sudah dihapus tidak bisa dikembalikan.', 'Deleted data cannot be restored.'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, hapus',
-                cancelButtonText: 'Batal',
+                confirmButtonText: t('Ya, hapus', 'Yes, delete'),
+                cancelButtonText: t('Batal', 'Cancel'),
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6b7280'
             }).then((result) => {
@@ -1377,7 +1406,7 @@
                 if (!result.isConfirmed) return;
 
                 Swal.fire({
-                    title: 'Menghapus...',
+                    title: t('Menghapus...', 'Deleting...'),
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
@@ -1396,8 +1425,8 @@
 
                         Swal.fire({
                             icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message ?? 'Data berhasil dihapus',
+                            title: t('Berhasil', 'Success'),
+                            text: res.message ?? t('Data berhasil dihapus', 'Data deleted successfully'),
                             timer: 1500,
                             showConfirmButton: false
                         });
@@ -1408,7 +1437,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: 'Gagal menghapus data'
+                            text: t('Gagal menghapus data', 'Failed to delete data')
                         });
                     });
             });

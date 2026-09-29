@@ -110,12 +110,12 @@
                 <div x-show="!collapsed" class="mb-5 px-2 select-none" x-transition:enter="transition ease-out duration-200">
                     <div class="space-y-1">
                         <h2 class="text-base font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                            Training Interbat
+                            Matriks Kompetensi Interbat
                         </h2>
                         <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
-                            data-id="Sistem Manajemen Pengembangan & Pelatihan"
-                            data-en="Development & Training Management System">
-                            Development & Training Management System
+                            data-id="Sistem Manajemen Pengembangan & Matriks"
+                            data-en="Development & Matriks Management System">
+                            Development & Matriks Management System
                         </p>
                     </div>
                     <div class="mt-4 h-px bg-gradient-to-r from-gray-200 via-gray-200/30 to-transparent dark:from-gray-700 dark:via-gray-700/30 dark:to-transparent"></div>
@@ -564,8 +564,8 @@
                             </span>
 
                             <span class="text-slate-500 dark:text-slate-400"
-                                data-id="Sistem Pelatihan" data-en="Training System">
-                                Training System
+                                data-id="Matriks Kompetensi" data-en="Competency Matriks">
+                                Competency Matriks
                             </span>
 
                         </div>

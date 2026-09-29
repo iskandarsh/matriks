@@ -6,7 +6,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h2 class="text-2xl font-extrabold mb-5 text-blue-500 flex items-center space-x-2 drop-shadow-sm">
                         <i class="fas fa-database text-blue-600 animate-pulse"></i>
-                        <span>Master Kategori</span>
+                        <span data-id="Master Kategori" data-en="Category Master">Master Kategori</span>
                     </h2>
 
                     <div id="applicantTabs" x-data="{
@@ -22,7 +22,7 @@
                             <button
                                 id="btnCreate"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
-                                <i class="fas fa-plus"></i> Create
+                                <i class="fas fa-plus"></i> <span data-id="Buat" data-en="Create">Buat</span>
                             </button>
                             @endcan
                         </div>
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- Modal Create Position -->
+    <!-- Modal Create Kategori -->
     <div
         id="modalCreate"
         class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 dark:bg-gray-900/90">
@@ -47,13 +47,13 @@
                 @csrf
 
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    📂 Tambah Master Kategori
+                    📂 <span data-id="Tambah Master Kategori" data-en="Add Category Master">Tambah Master Kategori</span>
                 </h2>
 
                 <!-- Nama kategori -->
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kategori <span class="text-red-500">*</span>
+                        <span data-id="Nama Kategori" data-en="Category Name">Nama Kategori</span> <span class="text-red-500">*</span>
                     </label>
 
                     <input
@@ -61,7 +61,9 @@
                         type="text"
                         required
                         class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-3 text-gray-800 dark:text-gray-100"
-                        placeholder="Contoh: Leadership">
+                        placeholder="Contoh: Leadership"
+                        data-id-placeholder="Contoh: Leadership"
+                        data-en-placeholder="Example: Leadership">
                 </div>
 
                 <!-- Footer -->
@@ -71,13 +73,13 @@
                         type="button"
                         onclick="document.getElementById('modalCreate').classList.add('hidden')"
                         class="text-gray-600 hover:text-gray-900 dark:text-gray-300">
-                        ❌ Batal
+                        ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                     </button>
 
                     <button
                         type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md">
-                        💾 Simpan
+                        💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                     </button>
 
                 </div>
@@ -87,7 +89,7 @@
     </div>
 
 
-    <!-- Modal Edit Position -->
+    <!-- Modal Edit Kategori -->
     <div
         id="modalEdit"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-blue-950/60 backdrop-blur-sm p-4">
@@ -101,12 +103,12 @@
                 <input type="hidden" id="edit_id">
 
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                    ✏️ Edit Master Kategori
+                    ✏️ <span data-id="Edit Master Kategori" data-en="Edit Category Master">Edit Master Kategori</span>
                 </h2>
 
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Nama Kategori <span class="text-red-500">*</span>
+                        <span data-id="Nama Kategori" data-en="Category Name">Nama Kategori</span> <span class="text-red-500">*</span>
                     </label>
 
                     <input
@@ -121,12 +123,12 @@
                     <button type="button"
                         onclick="document.getElementById('modalEdit').classList.add('hidden')"
                         class="text-gray-600">
-                        ❌ Batal
+                        ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                     </button>
 
                     <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                        💾 Simpan
+                        💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                     </button>
                 </div>
 
@@ -153,7 +155,27 @@
         });
     </script>
     <script>
+        // ===== Helper terjemahan (mengikuti bahasa di localStorage 'app_lang') =====
+        function t(id, en) {
+            let lang = window.appLang;
+            if (!lang) {
+                try {
+                    lang = localStorage.getItem('app_lang');
+                } catch (e) {}
+            }
+            return lang === 'en' ? en : id;
+        }
+
         $(document).ready(function() {
+
+            // Saat bahasa diganti lewat tombol 🌐, bangun ulang grid supaya caption/teks ikut berganti
+            if (typeof window.applyLanguage === 'function') {
+                const originalApplyLanguage = window.applyLanguage;
+                window.applyLanguage = function(lang) {
+                    originalApplyLanguage(lang);
+                    if ($('#grid').length && typeof loadTable === 'function') loadTable();
+                };
+            }
 
             $.ajaxSetup({
                 headers: {
@@ -196,10 +218,12 @@
                         rowAlternationEnabled: true,
                         columnAutoWidth: true,
                         columnHidingEnabled: true,
+                        noDataText: t('Tidak ada data', 'No data'),
 
                         searchPanel: {
                             visible: true,
-                            width: 240
+                            width: 240,
+                            placeholder: t('Cari...', 'Search...')
                         },
                         paging: {
                             pageSize: 10
@@ -207,7 +231,8 @@
                         pager: {
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
-                            showInfo: true
+                            showInfo: true,
+                            infoText: t('Halaman {0} dari {1} ({2} data)', 'Page {0} of {1} ({2} items)')
                         },
 
                         onCellPrepared(e) {
@@ -222,7 +247,7 @@
                         },
 
                         columns: [{
-                                caption: 'No',
+                                caption: t('No', 'No'),
                                 width: 50,
                                 alignment: 'center',
                                 cellTemplate(container, options) {
@@ -234,11 +259,11 @@
                             },
                             {
                                 dataField: 'nama',
-                                caption: 'Nama Kategori',
+                                caption: t('Nama Kategori', 'Category Name'),
                                 alignment: 'left'
                             },
                             {
-                                caption: 'Actions',
+                                caption: t('Aksi', 'Actions'),
                                 alignment: 'center',
                                 width: 150,
                                 cellTemplate(container, options) {
@@ -248,6 +273,7 @@
                                     if (userPermissions.edit) {
                                         $('<button>')
                                             .addClass('p-2 bg-yellow-500 text-white rounded')
+                                            .attr('title', t('Ubah', 'Edit'))
                                             .html('<i class="fas fa-edit"></i>')
                                             .on('click', () => openEditModal(id))
                                             .appendTo(container);
@@ -256,13 +282,15 @@
                                     if (userPermissions.delete) {
                                         $('<button>')
                                             .addClass('p-2 bg-red-600 text-white rounded')
+                                            .attr('title', t('Hapus', 'Delete'))
                                             .html('<i class="fas fa-trash"></i>')
                                             .on('click', () => {
                                                 Swal.fire({
-                                                    title: 'Hapus kategori?',
+                                                    title: t('Hapus kategori?', 'Delete category?'),
                                                     icon: 'warning',
                                                     showCancelButton: true,
-                                                    confirmButtonText: 'Ya'
+                                                    confirmButtonText: t('Ya', 'Yes'),
+                                                    cancelButtonText: t('Batal', 'Cancel')
                                                 }).then(result => {
                                                     if (result.isConfirmed) {
                                                         $.ajax({
@@ -272,8 +300,15 @@
                                                                 _token: $('meta[name="csrf-token"]').attr('content')
                                                             },
                                                             success(res) {
-                                                                Swal.fire('Berhasil', res.message, 'success');
+                                                                Swal.fire(t('Berhasil', 'Success'), res.message, 'success');
                                                                 loadTable();
+                                                            },
+                                                            error() {
+                                                                Swal.fire({
+                                                                    icon: 'error',
+                                                                    title: t('Gagal', 'Failed'),
+                                                                    text: t('Gagal menghapus data.', 'Failed to delete the data.')
+                                                                });
                                                             }
                                                         });
                                                     }
@@ -307,8 +342,8 @@
                 error: function() {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: 'Gagal mengambil data kategori.'
+                        title: t('Gagal', 'Failed'),
+                        text: t('Gagal mengambil data kategori.', 'Failed to fetch category data.')
                     });
                 }
             });
@@ -324,7 +359,7 @@
             const $btn = $form.find('button[type="submit"]');
             const originalText = $btn.html();
 
-            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...');
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> ' + t('Menyimpan...', 'Saving...'));
 
             $.ajax({
                 url: "{{ route('kategori.store') }}",
@@ -334,7 +369,7 @@
                 success: function(res) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Sukses!',
+                        title: t('Sukses!', 'Success!'),
                         text: res.message,
                     }).then(() => {
 
@@ -349,11 +384,11 @@
 
                 error: function(xhr) {
 
-                    let error = xhr.responseJSON?.message ?? 'Gagal menyimpan';
+                    let error = xhr.responseJSON?.message ?? t('Gagal menyimpan', 'Failed to save');
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal!',
+                        title: t('Gagal!', 'Failed!'),
                         text: error
                     });
                 },
@@ -380,7 +415,7 @@
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Sukses',
+                        title: t('Sukses', 'Success'),
                         text: res.message
                     });
 
@@ -393,8 +428,8 @@
 
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: xhr.responseJSON?.message ?? 'Gagal update'
+                        title: t('Gagal', 'Failed'),
+                        text: xhr.responseJSON?.message ?? t('Gagal update', 'Failed to update')
                     });
 
                 }
