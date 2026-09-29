@@ -270,8 +270,10 @@
     (function() {
         // ---------- Konfigurasi ----------
         const USER_NAME = $('#chat-widget').attr('data-user-name') || '';
-        const CHAT_URL = '../interbat/chat';
-        const RESET_URL = '../interbat/chat/reset';
+        @php $assets = env('APP_ASSETS');
+        @endphp
+        const CHAT_URL = "{{ $assets }}/chat";
+        const RESET_URL = "{{ $assets }}/chat/reset";
         const SUGGESTIONS = [
             'Apa yang bisa kamu bantu?',
             'Cara menggunakan sistem ini',

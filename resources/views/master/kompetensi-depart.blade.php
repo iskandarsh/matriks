@@ -6,14 +6,14 @@
 
                     <h2 class="text-2xl font-extrabold mb-5 text-blue-500 flex items-center space-x-2 drop-shadow-sm">
                         <i class="fas fa-sitemap text-blue-600 animate-pulse"></i>
-                        <span>Mapping Kompetensi - Depart</span>
+                        <span data-id="Mapping Kompetensi - Depart" data-en="Competency - Department Mapping">Mapping Kompetensi - Depart</span>
                     </h2>
 
                     <div class="mb-4 flex gap-2">
                         @can('create', [App\Models\MasterKompetensi::class, session('active_menu_id')])
                         <button id="btnMapping"
                             class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
-                            <i class="fas fa-link"></i> Mapping
+                            <i class="fas fa-link"></i> <span data-id="Mapping" data-en="Mapping">Mapping</span>
                         </button>
                         @endcan
 
@@ -33,7 +33,8 @@
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-lg">
 
             <h2 id="mappingTitle" class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                🔗 Mapping Kompetensi - Depart
+                <span id="mappingIcon">🔗</span>
+                <span id="mappingTitleText" data-id="Mapping Kompetensi - Depart" data-en="Competency - Department Mapping">Mapping Kompetensi - Depart</span>
             </h2>
 
             <form id="formMapping">
@@ -43,7 +44,7 @@
                 <!-- Kompetensi -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Kompetensi <span class="text-red-500">*</span>
+                        <span data-id="Kompetensi" data-en="Competency">Kompetensi</span> <span class="text-red-500">*</span>
                     </label>
 
                     <select id="map_kompetensi_ids" name="kompetensi_ids[]" class="w-full" style="width: 100%;" multiple required></select>
@@ -52,7 +53,7 @@
                 <!-- Depart -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-                        Depart <span class="text-red-500">*</span>
+                        <span data-id="Depart" data-en="Department">Depart</span> <span class="text-red-500">*</span>
                     </label>
 
                     <select id="map_depart_ids" name="depart_ids[]" class="w-full" style="width: 100%;" multiple required></select>
@@ -61,12 +62,12 @@
                 <div class="flex justify-end gap-4 pt-6 border-t mt-6 border-gray-200 dark:border-gray-700">
                     <button type="button" id="btnCancelMapping"
                         class="text-gray-600 hover:text-gray-900 dark:text-gray-300">
-                        ❌ Batal
+                        ❌ <span data-id="Batal" data-en="Cancel">Batal</span>
                     </button>
 
                     <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md">
-                        💾 Simpan
+                        💾 <span data-id="Simpan" data-en="Save">Simpan</span>
                     </button>
                 </div>
             </form>
@@ -91,9 +92,51 @@
     </script>
 
     <script>
+        // ===== Helper terjemahan (mengikuti bahasa di localStorage 'app_lang') =====
+        function t(id, en) {
+            let lang = window.appLang;
+            if (!lang) {
+                try {
+                    lang = localStorage.getItem('app_lang');
+                } catch (e) {}
+            }
+            return lang === 'en' ? en : id;
+        }
+
+        // Teks bawaan Select2 (tidak ada hasil / mencari)
+        function select2Lang() {
+            return {
+                noResults: () => t('Data tidak ditemukan', 'No results found'),
+                searching: () => t('Mencari...', 'Searching...')
+            };
+        }
+
+        // Judul modal (mode tambah / edit) - diberi data-id / data-en supaya ikut berganti saat toggle bahasa
+        function setMappingTitle(isEdit) {
+            const idText = isEdit ? 'Edit Mapping Kompetensi - Depart' : 'Mapping Kompetensi - Depart';
+            const enText = isEdit ? 'Edit Competency - Department Mapping' : 'Competency - Department Mapping';
+
+            $('#mappingIcon').text(isEdit ? '✏️' : '🔗');
+            $('#mappingTitleText')
+                .attr('data-id', idText)
+                .attr('data-en', enText)
+                .text(t(idText, enText));
+        }
+
         let gridInstance = null;
 
         $(document).ready(function() {
+
+            // Saat bahasa diganti lewat tombol 🌐, bangun ulang grid & select2 supaya teks ikut berganti
+            if (typeof window.applyLanguage === 'function') {
+                const originalApplyLanguage = window.applyLanguage;
+                window.applyLanguage = function(lang) {
+                    originalApplyLanguage(lang);
+                    initSelect2();
+                    if ($('#grid').length && typeof loadTable === 'function') loadTable();
+                };
+            }
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -128,7 +171,7 @@
                     data += '&_method=PUT';
                 }
 
-                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...');
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> ' + t('Menyimpan...', 'Saving...'));
 
                 $.ajax({
                     url: url,
@@ -137,7 +180,7 @@
                     success: function(res) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Sukses!',
+                            title: t('Sukses!', 'Success!'),
                             text: res.message
                         }).then(() => {
                             closeMappingModal();
@@ -145,10 +188,10 @@
                         });
                     },
                     error: function(xhr) {
-                        let error = xhr.responseJSON?.message ?? 'Gagal menyimpan mapping';
+                        let error = xhr.responseJSON?.message ?? t('Gagal menyimpan mapping', 'Failed to save mapping');
                         Swal.fire({
                             icon: 'error',
-                            title: 'Gagal!',
+                            title: t('Gagal!', 'Failed!'),
                             text: error
                         });
                     },
@@ -159,10 +202,19 @@
             });
         });
 
+        // Select2 dibuat ulang saat bahasa berganti supaya placeholder ikut berganti
+        // (opsi yang sudah terpilih tetap terjaga karena <option> tidak dihapus)
         function initSelect2() {
-            $('#map_kompetensi_ids').select2({
+            const $kompetensi = $('#map_kompetensi_ids');
+            const $depart = $('#map_depart_ids');
+
+            if ($kompetensi.hasClass('select2-hidden-accessible')) $kompetensi.select2('destroy');
+            if ($depart.hasClass('select2-hidden-accessible')) $depart.select2('destroy');
+
+            $kompetensi.select2({
                 theme: 'bootstrap-5',
-                placeholder: 'Pilih kompetensi...',
+                placeholder: t('Pilih kompetensi...', 'Select competency...'),
+                language: select2Lang(),
                 allowClear: true,
                 dropdownParent: $('#modalMapping'),
                 ajax: {
@@ -187,9 +239,10 @@
                 }
             });
 
-            $('#map_depart_ids').select2({
+            $depart.select2({
                 theme: 'bootstrap-5',
-                placeholder: 'Pilih depart...',
+                placeholder: t('Pilih depart...', 'Select department...'),
+                language: select2Lang(),
                 allowClear: true,
                 dropdownParent: $('#modalMapping'),
                 ajax: {
@@ -223,7 +276,7 @@
             $('#map_depart_ids').empty().trigger('change');
 
             if (id) {
-                $('#mappingTitle').text('✏️ Edit Mapping Kompetensi - Depart');
+                setMappingTitle(true);
 
                 $.ajax({
                     url: "{{ route('ikompetensi_depart.show', ':id') }}".replace(':id', id),
@@ -255,13 +308,13 @@
                     error: function() {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Gagal',
-                            text: 'Gagal mengambil data mapping.'
+                            title: t('Gagal', 'Failed'),
+                            text: t('Gagal mengambil data mapping.', 'Failed to fetch mapping data.')
                         });
                     }
                 });
             } else {
-                $('#mappingTitle').text('🔗 Mapping Kompetensi - Depart');
+                setMappingTitle(false);
                 $('#modalMapping').removeClass('hidden').addClass('flex');
             }
         }
@@ -272,7 +325,7 @@
             $('#map_depart_ids').val(null).trigger('change');
             $('#edit_mapping_id').val('');
             $('#modalMapping').addClass('hidden').removeClass('flex');
-            $('#mappingTitle').text('🔗 Mapping Kompetensi - Depart');
+            setMappingTitle(false);
         }
 
         function loadTable() {
@@ -319,6 +372,7 @@
                         columnAutoWidth: true,
                         columnHidingEnabled: true,
                         wordWrapEnabled: true,
+                        noDataText: t('Tidak ada data', 'No data'),
 
                         allowColumnReordering: true,
 
@@ -329,7 +383,10 @@
                         */
                         groupPanel: {
                             visible: true,
-                            emptyPanelText: 'Drag kolom ke sini untuk grouping'
+                            emptyPanelText: t(
+                                'Drag kolom ke sini untuk grouping',
+                                'Drag a column here to group'
+                            )
                         },
 
                         grouping: {
@@ -344,7 +401,8 @@
                         */
                         searchPanel: {
                             visible: true,
-                            width: 240
+                            width: 240,
+                            placeholder: t('Cari...', 'Search...')
                         },
 
                         /*
@@ -359,7 +417,8 @@
                         pager: {
                             showPageSizeSelector: true,
                             allowedPageSizes: [10, 25, 50],
-                            showInfo: true
+                            showInfo: true,
+                            infoText: t('Halaman {0} dari {1} ({2} data)', 'Page {0} of {1} ({2} items)')
                         },
 
                         /*
@@ -393,7 +452,7 @@
                             |--------------------------------------------------------------------------
                             */
                             {
-                                caption: 'No',
+                                caption: t('No', 'No'),
                                 width: 60,
                                 alignment: 'center',
 
@@ -416,7 +475,7 @@
                             */
                             {
                                 dataField: 'nama',
-                                caption: 'Kompetensi',
+                                caption: t('Kompetensi', 'Competency'),
                                 alignment: 'left'
                             },
 
@@ -427,7 +486,7 @@
                             */
                             {
                                 dataField: 'kategori.nama',
-                                caption: 'Kategori',
+                                caption: t('Kategori', 'Category'),
                                 alignment: 'center',
                                 width: 180,
 
@@ -451,7 +510,7 @@
                             |--------------------------------------------------------------------------
                             */
                             {
-                                caption: 'Depart',
+                                caption: t('Depart', 'Department'),
                                 alignment: 'left',
 
                                 calculateCellValue(rowData) {
@@ -488,7 +547,7 @@
                             |--------------------------------------------------------------------------
                             */
                             {
-                                caption: 'Actions',
+                                caption: t('Aksi', 'Actions'),
                                 alignment: 'center',
                                 width: 130,
 
@@ -519,7 +578,7 @@
                                             )
                                             .attr(
                                                 'title',
-                                                'Edit Mapping'
+                                                t('Ubah Mapping', 'Edit Mapping')
                                             )
                                             .on('click', function() {
 
@@ -545,17 +604,20 @@
                                             )
                                             .attr(
                                                 'title',
-                                                'Hapus Mapping'
+                                                t('Hapus Mapping', 'Delete Mapping')
                                             )
                                             .on('click', function() {
 
                                                 Swal.fire({
-                                                    title: 'Hapus mapping?',
-                                                    text: 'Semua relasi depart pada kompetensi ini akan dihapus.',
+                                                    title: t('Hapus mapping?', 'Delete mapping?'),
+                                                    text: t(
+                                                        'Semua relasi depart pada kompetensi ini akan dihapus.',
+                                                        'All department relations for this competency will be deleted.'
+                                                    ),
                                                     icon: 'warning',
                                                     showCancelButton: true,
-                                                    confirmButtonText: 'Ya, Hapus',
-                                                    cancelButtonText: 'Batal',
+                                                    confirmButtonText: t('Ya, Hapus', 'Yes, Delete'),
+                                                    cancelButtonText: t('Batal', 'Cancel'),
                                                     confirmButtonColor: '#dc2626'
                                                 }).then(result => {
 
@@ -585,7 +647,7 @@
                                                             ) {
 
                                                                 Swal.fire(
-                                                                    'Berhasil',
+                                                                    t('Berhasil', 'Success'),
                                                                     res.message,
                                                                     'success'
                                                                 );
@@ -596,8 +658,11 @@
                                                             error: function() {
 
                                                                 Swal.fire(
-                                                                    'Gagal',
-                                                                    'Terjadi kesalahan saat menghapus data.',
+                                                                    t('Gagal', 'Failed'),
+                                                                    t(
+                                                                        'Terjadi kesalahan saat menghapus data.',
+                                                                        'An error occurred while deleting the data.'
+                                                                    ),
                                                                     'error'
                                                                 );
                                                             }
