@@ -67,7 +67,9 @@
         <!-- Sidebar (utama) - ubah id supaya tidak duplikat -->
         @php
         $user = Auth::user();
-
+        $ssoToken = session('sso_token');
+        $appsUrl = env('APP_URL') . '/../interbat-main/apps.php'
+        . ($ssoToken ? '?token=' . urlencode($ssoToken) : '');
         // Cek last password change > 6 bulan atau belum pernah ganti password
         $mustChangePassword = !$user->last_password_change ||
         \Carbon\Carbon::parse($user->last_password_change)->lt(now()->subMonths(6));
@@ -297,7 +299,22 @@
                     </div>
                     @endforeach
 
+                    <div class="pt-2">
+                        <x-nav-link href="{{ $appsUrl }}"
+                            :active="false"
+                            title="Kembali ke Apps"
+                            data-id-title="Kembali ke Apps" data-en-title="Back to Apps"
+                            :class="collapsed ? 'justify-center p-2.5 sm:p-3' : 'px-3 py-2.5'"
+                            class="flex items-center gap-3 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 text-gray-800 dark:text-white hover:bg-blue-200 dark:hover:bg-gray-600">
 
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h6v6H4zM14 6h6v6h-6zM4 16h6v4H4zM14 16h6v4h-6z" />
+                            </svg>
+
+                            <span x-show="!collapsed" class="truncate text-xs sm:text-sm"
+                                data-id="Kembali ke Apps" data-en="Back to Apps">Kembali ke Apps</span>
+                        </x-nav-link>
+                    </div>
                 </nav>
             </div>
 
@@ -506,7 +523,11 @@
                                     🔐
                                     <span data-id="Ganti Password" data-en="Change Password">Ganti Password</span>
                                 </a>
-
+                                <a href="{{ $appsUrl }}"
+                                    class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3 text-sm md:text-base text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                                    🏠
+                                    <span data-id="Kembali ke Apps" data-en="Back to Apps">Kembali ke Apps</span>
+                                </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
 
