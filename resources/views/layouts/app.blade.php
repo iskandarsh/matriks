@@ -803,7 +803,48 @@
     @auth
     @include('components.chat-widget')
     @endauth
+    @auth
+    <script>
+        (function() {
+            const token = @json(session('sso_token'));
+            const PREFIX = '/interbat/messenger';
+            if (!token) return;
 
+            const isMessenger = (url) => String(url || '').includes(PREFIX);
+
+            // fetch
+            const origFetch = window.fetch;
+            window.fetch = function(input, init = {}) {
+                const url = typeof input === 'string' ? input : (input && input.url);
+                if (isMessenger(url)) {
+                    const headers = new Headers(init.headers || (input && input.headers) || {});
+                    headers.set('Authorization', 'Bearer ' + token);
+                    headers.set('Accept', 'application/json');
+                    init = Object.assign({}, init, {
+                        headers
+                    });
+                }
+                return origFetch.call(this, input, init);
+            };
+
+            // XMLHttpRequest (juga dipakai axios / jQuery)
+            const origOpen = XMLHttpRequest.prototype.open;
+            const origSend = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.open = function(method, url) {
+                this.__isMessenger = isMessenger(url);
+                return origOpen.apply(this, arguments);
+            };
+            XMLHttpRequest.prototype.send = function() {
+                if (this.__isMessenger) {
+                    this.setRequestHeader('Authorization', 'Bearer ' + token);
+                }
+                return origSend.apply(this, arguments);
+            };
+        })();
+    </script>
+
+    <x-messenger-widget base="/interbat/messenger" right="5.5rem" right-sm="6rem" />
+    @endauth
     <!-- ClockPicker JS -->
     <script src="{{ env('APP_URL') }}/assets/js/bootstrap-clockpicker.min.js"></script>
 
